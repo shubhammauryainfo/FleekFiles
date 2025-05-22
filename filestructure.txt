@@ -1,3 +1,4 @@
+|-- .env
 |-- .gitignore
 |-- bun.lock
 |-- next-env.d.ts
@@ -6,17 +7,26 @@
 |-- package.json
 |-- postcss.config.mjs
 |-- public
-    |-- file.svg
-    |-- globe.svg
-    |-- next.svg
-    |-- vercel.svg
-    |-- window.svg
+    |-- logo.png
 |-- README.md
 |-- src
     |-- app
+        |-- about
+            |-- page.tsx
+        |-- api
+            |-- upload
+                |-- route.ts
         |-- favicon.ico
         |-- globals.css
         |-- layout.tsx
-        |-- page.module.css
+        |-- not-found.tsx
         |-- page.tsx
+        |-- upload
+            |-- page.tsx
+    |-- components
+    |-- lib
+        |-- ftpClient.ts
+        |-- mongo.ts
+    |-- models
+        |-- FileMeta.ts
 |-- tsconfig.json
