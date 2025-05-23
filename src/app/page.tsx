@@ -21,7 +21,7 @@ export default function HomePage() {
         <p className="text-lg text-gray-700 max-w-xl">
           FleekFiles is your secure, FTP-backed file storage solution with a modern interface and MongoDB-powered metadata. Built for learning, ready for real use.
         </p>
-        <Link href="/upload">
+        <Link href="/files">
           <button className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">Get Started</button>
         </Link>
       </section>

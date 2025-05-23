@@ -14,16 +14,21 @@
         |-- about
             |-- page.tsx
         |-- api
+            |-- files
+                |-- route.ts
+                |-- [...path]
+                    |-- route.ts
             |-- upload
                 |-- route.ts
         |-- favicon.ico
+        |-- files
+            |-- page.tsx
         |-- globals.css
         |-- layout.tsx
         |-- not-found.tsx
         |-- page.tsx
-        |-- upload
-            |-- page.tsx
     |-- components
+        |-- Upload.tsx
     |-- lib
         |-- ftpClient.ts
         |-- mongo.ts
