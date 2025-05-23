@@ -1,6 +1,7 @@
 |-- .env
 |-- .gitignore
 |-- bun.lock
+|-- middleware.ts
 |-- next-env.d.ts
 |-- next.config.ts
 |-- package-lock.json
@@ -14,12 +15,18 @@
         |-- about
             |-- page.tsx
         |-- api
+            |-- auth
+                |-- [...nextauth]
+                    |-- route.ts
             |-- files
                 |-- route.ts
                 |-- [...path]
                     |-- route.ts
             |-- upload
                 |-- route.ts
+        |-- auth
+            |-- signin
+                |-- page.tsx
         |-- favicon.ico
         |-- files
             |-- page.tsx
@@ -28,7 +35,9 @@
         |-- not-found.tsx
         |-- page.tsx
     |-- components
+        |-- SessionProvider.tsx
         |-- Upload.tsx
+        |-- User.tsx
     |-- lib
         |-- ftpClient.ts
         |-- mongo.ts

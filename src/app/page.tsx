@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { AuthNav } from "@/components/User";
 
 export default function HomePage() {
+
   return (
+
     <div className="min-h-screen flex flex-col font-sans">
+      <AuthNav />
       {/* Header */}
       <header className="bg-gray-900 text-white px-8 py-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold">FleekFiles</h1>

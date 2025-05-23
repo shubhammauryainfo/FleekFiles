@@ -148,7 +148,7 @@ export default function FilesPage() {
             >
               <FaTimes size={18} />
             </button>
-            <h2 className="text-xl font-semibold mb-4">Upload a File to Fleekfiles</h2>
+            <h2 className="text-xl font-semibold mb-4">Upload a File</h2>
             <Upload />
           </div>
         </div>
