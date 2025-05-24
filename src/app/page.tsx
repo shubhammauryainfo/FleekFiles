@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AuthNav } from "@/components/User";
+import { useSession, signIn, signOut } from "next-auth/react";
+import {  FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 import { 
   FiUploadCloud, 
   FiShield, 
@@ -26,6 +27,7 @@ import {
   AiOutlineCloudUpload,
   AiOutlineStar 
 } from "react-icons/ai";
+import { FaSignInAlt } from "react-icons/fa";
 
 export default function HomePage() {
   const [formData, setFormData] = useState({
@@ -35,6 +37,8 @@ export default function HomePage() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: session } = useSession();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -100,27 +104,124 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-gray-50">
-      <AuthNav />
+   
       
       {/* Modern Header */}
-      <header className="bg-white shadow-sm border-b px-8 py-4 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-          <div className=" flex items-center justify-center">
-              <Image src="/logo.png" alt="FleekFiles Logo" width={40} height={40}  />
+      <header className="bg-gradient-to-r from-white via-slate-50 to-slate-100 backdrop-blur-md shadow-xl shadow-slate-200/50 border-b border-slate-200/60 px-8 py-5 sticky top-0 z-50">
+  <div className="max-w-7xl mx-auto flex justify-between items-center">
+    {/* Logo Section */}
+    <div className="flex items-center space-x-4 group">
+      <div className="relative flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
+        <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-blue-500 rounded-full opacity-20 blur-md group-hover:opacity-30 transition-opacity duration-300"></div>
+        <Image 
+          src="/logo.png" 
+          alt="FleekFiles Logo" 
+          width={44} 
+          height={44} 
+          className="relative z-10 drop-shadow-md"
+        />
+      </div>
+      <div className="flex flex-col">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent hover:from-teal-500 hover:via-cyan-500 hover:to-blue-500 transition-all duration-500">
+          FleekFiles
+        </h1>
+        <div className="h-0.5 w-0 bg-gradient-to-r from-teal-500 to-blue-500 group-hover:w-full transition-all duration-500 ease-out"></div>
+      </div>
+    </div>
+
+    {/* Navigation */}
+    <nav className="hidden md:flex items-center space-x-1">
+      {/* Navigation Links */}
+      <div className="flex items-center space-x-1 mr-6">
+        <Link 
+          href="#features" 
+          className="relative px-4 py-2 text-slate-700 font-medium rounded-lg hover:text-teal-600 hover:bg-white/60 transition-all duration-300 group"
+        >
+          <span className="relative z-10">Features</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </Link>
+        
+        <Link 
+          href="#about" 
+          className="relative px-4 py-2 text-slate-700 font-medium rounded-lg hover:text-teal-600 hover:bg-white/60 transition-all duration-300 group"
+        >
+          <span className="relative z-10">About</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </Link>
+        
+        <Link 
+          href="#tech" 
+          className="relative px-4 py-2 text-slate-700 font-medium rounded-lg hover:text-teal-600 hover:bg-white/60 transition-all duration-300 group"
+        >
+          <span className="relative z-10">Technology</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </Link>
+        
+        <Link 
+          href="#contact" 
+          className="relative px-4 py-2 text-slate-700 font-medium rounded-lg hover:text-teal-600 hover:bg-white/60 transition-all duration-300 group"
+        >
+          <span className="relative z-10">Contact</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-blue-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </Link>
+      </div>
+
+      {/* Auth Section */}
+      <div className="flex items-center">
+        {session ? (
+          <div className="flex items-center space-x-4">
+            {/* User Info */}
+            <div className="flex items-center space-x-3 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-xl border border-slate-200/60 shadow-sm">
+              <div className="relative">
+                {session.user?.image ? (
+                  <img
+                    src={session.user.image}
+                    alt="User Avatar"
+                    className="w-8 h-8 rounded-full ring-2 ring-teal-500/20 shadow-sm"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                    <FaUserCircle className="text-white text-sm" />
+                  </div>
+                )}
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+              </div>
+              <span className="text-slate-800 font-semibold text-sm truncate max-w-24">
+                {session.user?.name}
+              </span>
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent">
-              FleekFiles
-            </h1>
+
+            {/* Logout Button */}
+            <button 
+              onClick={() => signOut()} 
+              className="group flex items-center gap-2.5 px-5 py-2.5 text-sm font-medium text-white 
+              bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg shadow-red-500/25
+              hover:from-red-600 hover:to-red-700 hover:shadow-xl hover:shadow-red-500/30 
+              hover:-translate-y-0.5 active:scale-95 transition-all duration-300 ease-out
+              focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-white"
+            >
+              <FaSignOutAlt className="group-hover:rotate-12 transition-transform duration-300" />
+              <span>Sign Out</span>
+            </button>
           </div>
-          <nav className="hidden md:flex space-x-8">
-            <Link href="#features" className="text-gray-600 hover:text-teal-600 transition-colors">Features</Link>
-            <Link href="#about" className="text-gray-600 hover:text-teal-600 transition-colors">About</Link>
-            <Link href="#tech" className="text-gray-600 hover:text-teal-600 transition-colors">Technology</Link>
-            <Link href="#contact" className="text-gray-600 hover:text-teal-600 transition-colors">Contact</Link>
-          </nav>
-        </div>
-      </header>
+        ) : (
+          <Link 
+            href='/auth/register' 
+            className="group flex items-center gap-2.5 px-6 py-2.5 text-sm font-medium text-white 
+            bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl shadow-lg shadow-teal-500/25
+            hover:from-teal-600 hover:to-blue-700 hover:shadow-xl hover:shadow-teal-500/30 
+            hover:-translate-y-0.5 active:scale-95 transition-all duration-300 ease-out
+            focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2 focus:ring-offset-white"
+          >
+            <FaSignInAlt className="group-hover:translate-x-0.5 transition-transform duration-300" />
+            <span>Get Started</span>
+          </Link>
+        )}
+      </div>
+    </nav>
+  </div>
+</header>
+
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50">
@@ -142,7 +243,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link href="/files">
                 <button className="group bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-teal-600 hover:via-cyan-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center">
-                  Get Started Free
+                   Free Try
                   <FiArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>

@@ -1,15 +1,21 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Swal from "sweetalert2";
 import { useSession } from "next-auth/react";
 
 export default function Upload() {
   const { data: session } = useSession();
   const [file, setFile] = useState<File | null>(null);
-  const [userId, setUserId] = useState<string>(session?.user?.id || "");
+  const [userId, setUserId] = useState<string>("");
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      setUserId(session.user.id);
+    }
+  }, [session]);
 
   const handleUpload = () => {
     if (!file) return;
