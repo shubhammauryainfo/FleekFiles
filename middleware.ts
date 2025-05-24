@@ -1,4 +1,3 @@
-// middleware.ts
 import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -6,15 +5,16 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   const { pathname } = req.nextUrl;
+  console.log("🧪 Path:", req.nextUrl.pathname);
+  console.log("🧪 Token:", token);
 
-  // Define protected paths
   const protectedPaths = ["/files", "/upload"];
   const isProtected = protectedPaths.some((path) =>
     pathname.startsWith(path)
   );
 
   if (isProtected && !token) {
-    const signInUrl = new URL("/auth/signin", req.url); // Use the correct custom login path
+    const signInUrl = new URL("/auth/signin", req.url);
     signInUrl.searchParams.set("callbackUrl", req.url);
     return NextResponse.redirect(signInUrl);
   }
@@ -23,5 +23,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/files/:path*", "/upload"],
+  matcher: ["/files/:path*", "/upload/:path*"],
 };

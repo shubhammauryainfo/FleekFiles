@@ -22,9 +22,13 @@
                 |-- route.ts
                 |-- [...path]
                     |-- route.ts
+            |-- register
+                |-- route.ts
             |-- upload
                 |-- route.ts
         |-- auth
+            |-- register
+                |-- page.tsx
             |-- signin
                 |-- page.tsx
         |-- favicon.ico
@@ -40,7 +44,10 @@
         |-- User.tsx
     |-- lib
         |-- ftpClient.ts
-        |-- mongo.ts
+        |-- mongoose.ts
     |-- models
         |-- FileMeta.ts
+        |-- User.ts
+    |-- types
+        |-- next-auth.d.ts
 |-- tsconfig.json

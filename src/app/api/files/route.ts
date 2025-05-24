@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongo";
+import dbConnect from "@/lib/mongoose";
 import { FileMeta } from "@/models/FileMeta";
 
 export async function GET() {
-  const client = await clientPromise;
-  const db = client.db();
-  const files = db.collection<FileMeta>("files");
+  await dbConnect();
 
-  const allFiles = await files
-    .find({})
-    .sort({ uploadedAt: -1 }) // newest first
-    .toArray();
+  const allFiles = await FileMeta.find({})
+    .sort({ uploadedAt: -1 })
+    .lean();
 
   return NextResponse.json(allFiles);
 }

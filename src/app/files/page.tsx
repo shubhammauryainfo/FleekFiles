@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import Upload from "@/components/Upload";
+import { AuthNav } from "@/components/User";
 import {
   FaFilePdf,
   FaFileWord,
@@ -97,7 +98,10 @@ export default function FilesPage() {
   }, []);
 
   return (
+    <div>
+    <AuthNav />
     <main className="p-8 max-w-7xl mx-auto">
+     
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Uploaded Files</h1>
         <button
@@ -154,5 +158,6 @@ export default function FilesPage() {
         </div>
       )}
     </main>
+    </div>
   );
 }

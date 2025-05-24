@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectFTP } from "@/lib/ftpClient";
-import clientPromise from "@/lib/mongo";
+import dbConnect from "@/lib/mongoose";
 import { FileMeta } from "@/models/FileMeta";
-import { Readable } from "stream"; // ✅ Import Readable
+import { Readable } from "stream";
 
 export async function POST(req: NextRequest) {
   const data = await req.formData();
@@ -15,20 +15,19 @@ export async function POST(req: NextRequest) {
 
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  const stream = Readable.from(buffer); // ✅ Convert Buffer to Readable stream
+  const stream = Readable.from(buffer);
 
   const ftpClient = await connectFTP();
   const filePath = `/uploads/${file.name}`;
 
   await ftpClient.ensureDir("/uploads");
-  await ftpClient.uploadFrom(stream, filePath); // ✅ Upload using stream
+  await ftpClient.uploadFrom(stream, filePath);
   ftpClient.close();
 
-  const mongoClient = await clientPromise;
-  const db = mongoClient.db();
-  const files = db.collection<FileMeta>("files");
+  await dbConnect();
 
-  await files.insertOne({
+  // Use Mongoose model to save metadata
+  await FileMeta.create({
     filename: file.name,
     path: filePath,
     userId,
