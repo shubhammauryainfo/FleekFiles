@@ -18,6 +18,8 @@
             |-- auth
                 |-- [...nextauth]
                     |-- route.ts
+            |-- debug
+                |-- route.ts
             |-- files
                 |-- route.ts
                 |-- [...path]

@@ -1,27 +1,37 @@
 import { getToken } from "next-auth/jwt";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export async function middleware(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  const { pathname } = req.nextUrl;
-  console.log("🧪 Path:", req.nextUrl.pathname);
-  console.log("🧪 Token:", token);
+  // Log to verify middleware is running
+  console.log("🔐 Middleware triggered for:", pathname);
 
-  const protectedPaths = ["/files", "/upload"];
-  const isProtected = protectedPaths.some((path) =>
-    pathname.startsWith(path)
+  // Define protected routes (App Router)
+  const protectedRoutes = ["/files", "/upload"];
+  const isProtected = protectedRoutes.some((route) =>
+    pathname === route || pathname.startsWith(`${route}/`)
   );
 
-  if (isProtected && !token) {
-    const signInUrl = new URL("/auth/signin", req.url);
-    signInUrl.searchParams.set("callbackUrl", req.url);
-    return NextResponse.redirect(signInUrl);
+  if (isProtected) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token) {
+      const signInUrl = new URL("/auth/signin", request.url);
+      signInUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(signInUrl);
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/files/:path*", "/upload/:path*"],
-};
+    // Match all routes except static files and API
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico|logo.png).*)"],
+  };
+  

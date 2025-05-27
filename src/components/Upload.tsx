@@ -72,17 +72,13 @@ function formatFileSize(bytes: number) {
 export default function Upload() {
   const { data: session } = useSession();
   const [file, setFile] = useState<File | null>(null);
-  const [userId, setUserId] = useState<string>("");
+  const [userId, setUserId] = useState<string>(session?.user?.id || '');
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    if (session?.user?.id) {
-      setUserId(session.user.id);
-    }
-  }, [session]);
+
 
   const handleUpload = () => {
     if (!file) return;

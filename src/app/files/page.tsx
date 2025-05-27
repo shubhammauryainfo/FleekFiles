@@ -148,7 +148,7 @@ export default function FilesPage() {
                 </div>
 
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                   className="group flex items-center gap-3 px-6 py-3 text-sm font-semibold text-white 
                   bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl shadow-lg shadow-red-500/25
                   hover:from-red-600 hover:to-rose-700 hover:shadow-xl hover:shadow-red-500/30 

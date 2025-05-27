@@ -17,7 +17,7 @@ export default function SignInPage() {
   const params = useSearchParams();
 
 
-  const callbackUrl = params.get("callbackUrl") || "/";
+  const callbackUrl =  "/files";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
