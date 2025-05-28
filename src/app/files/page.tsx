@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaTimes, FaSearch, FaFilter, FaDownload, FaEye, FaTrash, FaSort } from "react-icons/fa";
+import { FaTimes, FaSearch, FaFilter, FaDownload, FaEye, FaTrash, FaSort, FaHdd } from "react-icons/fa";
 import Upload from "@/components/Upload";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { FaSignInAlt, FaSignOutAlt, FaUserCircle, FaPlus } from "react-icons/fa";
 import {
   FaFilePdf,
@@ -91,11 +92,18 @@ export default function FilesPage() {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const { data: session } = useSession();
+  const { data: session  } = useSession();
+  const { user, isAuthenticated } = useCurrentUser();
 
   const filteredFiles = files.filter(file => 
     file.filename.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Calculate storage usage
+  const totalStorageUsed = files.reduce((total, file) => total + file.size, 0);
+  const storageLimit = 2 * 1024 * 1024 * 1024; // 2GB in bytes
+  const storagePercentage = Math.min((totalStorageUsed / storageLimit) * 100, 100);
+  const remainingStorage = Math.max(storageLimit - totalStorageUsed, 0);
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -113,6 +121,8 @@ export default function FilesPage() {
     fetchFiles();
   }, []);
 
+  console.log(user?.id);
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Enhanced Navigation */}
@@ -219,6 +229,77 @@ export default function FilesPage() {
           </div>
         </div>
 
+        {/* Storage Usage Progress Bar */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-200/60 p-6 mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+                <FaHdd className="text-white text-xl" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-800">Storage Usage</h3>
+                <p className="text-sm text-slate-600">
+                  {formatFileSize(totalStorageUsed)} of {formatFileSize(storageLimit)} used
+                </p>
+              </div>
+            </div>
+            <div className="ml-auto text-right">
+              <div className="text-2xl font-bold text-slate-800">
+                {storagePercentage.toFixed(1)}%
+              </div>
+              <div className="text-sm text-slate-600">
+                {formatFileSize(remainingStorage)} remaining
+              </div>
+            </div>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="relative">
+            <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden shadow-inner">
+              <div 
+                className={`h-full rounded-full transition-all duration-1000 ease-out ${
+                  storagePercentage >= 90 
+                    ? 'bg-gradient-to-r from-red-500 to-red-600' 
+                    : storagePercentage >= 75 
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+                      : 'bg-gradient-to-r from-blue-500 to-indigo-600'
+                }`}
+                style={{ width: `${storagePercentage}%` }}
+              ></div>
+            </div>
+            
+            {/* Storage Milestones */}
+            <div className="flex justify-between mt-2 text-xs text-slate-500">
+              <span>0 GB</span>
+              <span>1 GB</span>
+              <span>2 GB</span>
+            </div>
+          </div>
+          
+          {/* Storage Warning */}
+          {storagePercentage >= 90 && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <p className="text-red-700 font-semibold text-sm">
+                  Storage Almost Full! Only {formatFileSize(remainingStorage)} remaining.
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {storagePercentage >= 75 && storagePercentage < 90 && (
+            <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                <p className="text-amber-700 font-semibold text-sm">
+                  Storage Warning: {formatFileSize(remainingStorage)} remaining.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Enhanced Search and Filter Bar */}
         <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-200/60 p-6 mb-8">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -236,6 +317,10 @@ export default function FilesPage() {
             </div>
             
             <div className="flex items-center gap-3">
+              <div className="px-4 py-3 bg-slate-50 rounded-xl text-sm font-medium text-slate-600">
+                {filteredFiles.length} file{filteredFiles.length !== 1 ? 's' : ''}
+              </div>
+              
               <button
                 onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
                 className="px-4 py-3 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all duration-300
@@ -414,9 +499,25 @@ export default function FilesPage() {
               
               <div className="mb-8">
                 <h2 className="text-3xl font-bold text-slate-800 mb-2">Upload Files</h2>
-                <p className="text-slate-600 font-medium">
+                <p className="text-slate-600 font-medium mb-4">
                   Select files from your device to upload to your library
                 </p>
+                
+                {/* Storage info in modal */}
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-600">Available storage:</span>
+                    <span className="font-semibold text-slate-800">
+                      {formatFileSize(remainingStorage)} remaining
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-2 mt-2">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
+                      style={{ width: `${storagePercentage}%` }}
+                    ></div>
+                  </div>
+                </div>
               </div>
               
               <Upload />

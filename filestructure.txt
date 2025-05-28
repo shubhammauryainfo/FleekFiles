@@ -44,6 +44,8 @@
         |-- SessionProvider.tsx
         |-- Upload.tsx
         |-- User.tsx
+    |-- hooks
+        |-- useCurrentUser.ts
     |-- lib
         |-- ftpClient.ts
         |-- mongoose.ts

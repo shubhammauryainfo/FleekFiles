@@ -5,13 +5,22 @@ import type { NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Log to verify middleware is running
-  console.log("🔐 Middleware triggered for:", pathname);
+  // Log middleware execution
+  console.log("🔒 Middleware running on:", pathname);
 
-  // Define protected routes (App Router)
+  // Allow public routes and static files
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/auth") ||
+    pathname.includes(".") // static files like .ico, .png, etc.
+  ) {
+    return NextResponse.next();
+  }
+
+  // Protected routes
   const protectedRoutes = ["/files", "/upload"];
-  const isProtected = protectedRoutes.some((route) =>
-    pathname === route || pathname.startsWith(`${route}/`)
+  const isProtected = protectedRoutes.some(route =>
+    pathname === route || pathname.startsWith(route + "/")
   );
 
   if (isProtected) {
@@ -30,8 +39,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
+// ✅ Define where the middleware applies
 export const config = {
-    // Match all routes except static files and API
-    matcher: ["/((?!api|_next/static|_next/image|favicon.ico|logo.png).*)"],
-  };
-  
+  matcher: ["/files/:path*", "/upload/:path*"],
+};
