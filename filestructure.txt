@@ -21,12 +21,17 @@
             |-- debug
                 |-- route.ts
             |-- files
+                |-- delete
+                    |-- [...id]
+                        |-- route.ts
                 |-- route.ts
                 |-- [...path]
                     |-- route.ts
             |-- register
                 |-- route.ts
             |-- upload
+                |-- route.ts
+            |-- user
                 |-- route.ts
         |-- auth
             |-- register

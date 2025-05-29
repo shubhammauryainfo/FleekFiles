@@ -1,7 +1,7 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, use } from "react";
 import Swal from "sweetalert2";
-import { useSession } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { 
   FaCloudUploadAlt, 
   FaFile, 
@@ -70,13 +70,14 @@ function formatFileSize(bytes: number) {
 }
 
 export default function Upload() {
-  const { data: session } = useSession();
+  const {user} = useCurrentUser();
   const [file, setFile] = useState<File | null>(null);
-  const [userId, setUserId] = useState<string>(session?.user?.id || '');
+  const [userId, setUserId] = useState<string>(user?.id);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
+  
 
 
 

@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { FaTimes, FaSearch, FaFilter, FaDownload, FaEye, FaTrash, FaSort, FaHdd } from "react-icons/fa";
 import Upload from "@/components/Upload";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { FaSignInAlt, FaSignOutAlt, FaUserCircle, FaPlus } from "react-icons/fa";
 import {
   FaFilePdf,
@@ -91,7 +93,10 @@ export default function FilesPage() {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const { data: session  } = useSession();
+  const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const { user } = useCurrentUser();
 
   const filteredFiles = files.filter(file => 
     file.filename.toLowerCase().includes(searchTerm.toLowerCase())
@@ -104,9 +109,10 @@ export default function FilesPage() {
   const remainingStorage = Math.max(storageLimit - totalStorageUsed, 0);
 
   useEffect(() => {
+    if (!user) return;
     const fetchFiles = async () => {
       try {
-        const res = await fetch(`/api/files?userId=${session?.user.id}`);
+        const res = await fetch(`/api/files?userId=${user.id}`);
         if (!res.ok) throw new Error("Failed to fetch files");
         const data = await res.json();
         setFiles(data);
@@ -117,9 +123,44 @@ export default function FilesPage() {
       }
     };
     fetchFiles();
-  }, []);
+  }, [user]);
 
- 
+  const handleDeleteFile = async (fileId: string) => {
+    setDeletingFiles(prev => new Set(prev).add(fileId));
+    setShowDeleteConfirm(null);
+    
+    try {
+      const res = await fetch(`/api/files/delete/${fileId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!res.ok) {
+        throw new Error('Failed to delete file');
+      }
+      
+      // Wait for animation to show
+      setTimeout(() => {
+        setFiles(prev => prev.filter(file => file._id !== fileId));
+        setDeletingFiles(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(fileId);
+          return newSet;
+        });
+      }, 500);
+      
+    } catch (err: any) {
+      setError(err.message || "Failed to delete file");
+      setDeletingFiles(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(fileId);
+        return newSet;
+      });
+    }
+  };
+
+  const confirmDelete = (fileId: string) => {
+    setShowDeleteConfirm(fileId);
+  };
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -132,10 +173,12 @@ export default function FilesPage() {
                 <div className="flex items-center gap-4">
                   <div className="relative group">
                     {session.user?.image ? (
-                      <img
+                      <Image
                         src={session.user.image}
                         alt="User Avatar"
-                        className="w-12 h-12 rounded-full ring-2 ring-blue-500/30 shadow-lg transition-all duration-300 group-hover:ring-blue-500/50"
+                        className="rounded-full ring-2 ring-blue-500/30 shadow-lg transition-all duration-300 group-hover:ring-blue-500/50"
+                        width={50}
+                        height={50}
                       />
                     ) : (
                       <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
@@ -366,7 +409,15 @@ export default function FilesPage() {
         {/* Error State */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
-            <p className="text-red-700 font-medium">⚠️ {error}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-red-700 font-medium">⚠️ {error}</p>
+              <button
+                onClick={() => setError(null)}
+                className="text-red-500 hover:text-red-700 transition-colors"
+              >
+                <FaTimes />
+              </button>
+            </div>
           </div>
         )}
 
@@ -397,88 +448,167 @@ export default function FilesPage() {
                   ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                   : "space-y-4"
               }>
-                {filteredFiles.map((file) => (
-                  <div
-                    key={file._id}
-                    className={`group bg-white/70 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg shadow-slate-200/50
-                    hover:shadow-xl hover:shadow-slate-300/50 hover:-translate-y-1 transition-all duration-300
-                    ${viewMode === 'list' ? 'flex items-center p-6' : 'p-6'}`}
-                  >
-                    {viewMode === 'grid' ? (
-                      <>
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center flex-1 min-w-0">
-                            {getFileIcon(file.filename)}
-                            <h3 className="font-semibold text-slate-800 truncate text-lg">
-                              {file.filename}
-                            </h3>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-3 mb-6">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-slate-500 font-medium">Size</span>
-                            <span className="text-slate-700 font-semibold">{formatFileSize(file.size)}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-slate-500 font-medium">Uploaded</span>
-                            <span className="text-slate-700 font-semibold">
-                              {new Date(file.uploadedAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <a
-                            href={`/api/files${file.path}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 
-                            bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 
-                            transition-all duration-300 font-medium group-hover:bg-blue-600 group-hover:text-white"
-                          >
-                            <FaDownload className="text-sm" />
-                            Download
-                          </a>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center flex-1 min-w-0 mr-6">
-                          {getFileIcon(file.filename)}
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-slate-800 truncate text-lg mb-1">
-                              {file.filename}
-                            </h3>
-                            <div className="flex items-center gap-4 text-sm text-slate-500">
-                              <span>{formatFileSize(file.size)}</span>
-                              <span>•</span>
-                              <span>{new Date(file.uploadedAt).toLocaleDateString()}</span>
+                {filteredFiles.map((file) => {
+                  const isDeleting = deletingFiles.has(file._id);
+                  
+                  return (
+                    <div
+                      key={file._id}
+                      className={`group bg-white/70 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg shadow-slate-200/50
+                      hover:shadow-xl hover:shadow-slate-300/50 hover:-translate-y-1 transition-all duration-300
+                      ${viewMode === 'list' ? 'flex items-center p-6' : 'p-6'}
+                      ${isDeleting ? 'animate-pulse opacity-50 scale-95' : ''}`}
+                    >
+                      {viewMode === 'grid' ? (
+                        <>
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center flex-1 min-w-0">
+                              {getFileIcon(file.filename)}
+                              <h3 className="font-semibold text-slate-800 truncate text-lg">
+                                {file.filename}
+                              </h3>
                             </div>
                           </div>
-                        </div>
+                          
+                          <div className="space-y-3 mb-6">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-500 font-medium">Size</span>
+                              <span className="text-slate-700 font-semibold">{formatFileSize(file.size)}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-500 font-medium">Uploaded</span>
+                              <span className="text-slate-700 font-semibold">
+                                {new Date(file.uploadedAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
 
-                        <a
-                          href={`/api/files${file.path}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-6 py-3 
-                          bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-600 hover:text-white
-                          transition-all duration-300 font-medium"
-                        >
-                          <FaDownload />
-                          Download
-                        </a>
-                      </>
-                    )}
-                  </div>
-                ))}
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={`/api/files${file.path}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 
+                              bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 
+                              transition-all duration-300 font-medium group-hover:bg-blue-600 group-hover:text-white"
+                            >
+                              <FaDownload className="text-sm" />
+                              Download
+                            </a>
+                            
+                            <button
+                              onClick={() => confirmDelete(file._id)}
+                              disabled={isDeleting}
+                              className="flex items-center justify-center p-3 
+                              bg-red-50 text-red-600 rounded-xl hover:bg-red-100 hover:text-red-700
+                              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
+                              group-hover:bg-red-600 group-hover:text-white"
+                            >
+                              {isDeleting ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                              ) : (
+                                <FaTrash className="text-sm" />
+                              )}
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center flex-1 min-w-0 mr-6">
+                            {getFileIcon(file.filename)}
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-slate-800 truncate text-lg mb-1">
+                                {file.filename}
+                              </h3>
+                              <div className="flex items-center gap-4 text-sm text-slate-500">
+                                <span>{formatFileSize(file.size)}</span>
+                                <span>•</span>
+                                <span>{new Date(file.uploadedAt).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <a
+                              href={`/api/files${file.path}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 px-6 py-3 
+                              bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-600 hover:text-white
+                              transition-all duration-300 font-medium"
+                            >
+                              <FaDownload />
+                              Download
+                            </a>
+                            
+                            <button
+                              onClick={() => confirmDelete(file._id)}
+                              disabled={isDeleting}
+                              className="flex items-center gap-2 px-4 py-3 
+                              bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white
+                              transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {isDeleting ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                              ) : (
+                                <FaTrash />
+                              )}
+                              {!isDeleting && <span>Delete</span>}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </>
         )}
 
-        {/* Enhanced Modal */}
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div 
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setShowDeleteConfirm(null)}
+            ></div>
+            <div className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md transform transition-all duration-300 scale-100">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <FaTrash className="text-red-600 text-2xl" />
+                </div>
+                
+                <h3 className="text-2xl font-bold text-slate-800 mb-2">Delete File</h3>
+                <p className="text-slate-600 mb-2">
+                  Are you sure you want to delete this file?
+                </p>
+                <p className="text-sm text-slate-500 mb-8">
+                  {files.find(f => f._id === showDeleteConfirm)?.filename}
+                </p>
+                
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowDeleteConfirm(null)}
+                    className="flex-1 px-6 py-3 bg-slate-100 text-slate-700 rounded-xl 
+                    hover:bg-slate-200 transition-all duration-300 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleDeleteFile(showDeleteConfirm)}
+                    className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl 
+                    hover:bg-red-700 transition-all duration-300 font-medium"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Enhanced Upload Modal */}
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div 
@@ -500,7 +630,6 @@ export default function FilesPage() {
                 <p className="text-slate-600 font-medium mb-4">
                   Select files from your device to upload to your library
                 </p>
-                
                 {/* Storage info in modal */}
                 <div className="bg-slate-50 rounded-xl p-4">
                   <div className="flex items-center justify-between text-sm">

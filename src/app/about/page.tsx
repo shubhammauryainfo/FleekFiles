@@ -1,8 +1,17 @@
-'use client';
-import { useCurrentUserId } from "@/hooks/useCurrentUser";
+"use client";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
-export default function page() {
-  const userId = useCurrentUserId();
+export default function ProfilePage() {
+  const { user, loading } = useCurrentUser();
 
-  return <div>User ID: {userId ?? "Not logged in"}</div>;
+  if (loading) return <p>Loading...</p>;
+  if (!user) return <p>User not logged in</p>;
+
+  return (
+    <div>
+      <h1>Hello, {user.name}</h1>
+      <p>Email: {user.email}</p>
+      <p>ID: {user.id}</p>
+    </div>
+  );
 }
