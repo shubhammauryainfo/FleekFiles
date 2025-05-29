@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       },
       server_session: {
         exists: !!session,
-        data: session?.user
+        data: session
       },
       cookies: req.cookies.getAll().map(cookie => ({
         name: cookie.name,

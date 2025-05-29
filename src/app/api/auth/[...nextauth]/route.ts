@@ -43,42 +43,49 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  
+    
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = (user as any).id ?? (user as any).sub;
+        token.id = user.id ?? token.sub;
         token.name = user.name;
         token.email = user.email;
-        token.provider = (user as any).provider;
-        token.phone = (user as any).phone;
+        token.provider = user.provider;
+        token.phone = user.phone;
       }
       return token;
     },
-  
-    async session({ session, token }) {
-    if (session.user) {
-      session.user.id = token.id ?? token.sub ?? null;
-      session.user.name = token.name ?? null;
-      session.user.email = token.email ?? null;
-      session.user.image = token.image ?? null;
-      session.user.provider = token.provider ?? null;
-      session.user.phone = token.phone ?? null;
-    }
-    return session;
-  },
-
-  
+      
+    async session({ session, token}) {
+      
+      if (session.user) {
+        session.user.userid = token.sub ?? "shubham";
+        session.user.name = token.name ?? null;
+        session.user.email = token.email ?? null;
+        session.user.image = token.picture ?? token.image ?? null;
+        session.user.provider = token.provider ?? null;
+        session.user.phone = token.phone ?? null;
+      }
+      return session;
+    },
+        
     async signIn({ user, account }) {
       await dbConnect();
       if (account?.provider === "google" && user.email) {
         const existingUser = await User.findOne({ email: user.email });
         if (!existingUser) {
-          await User.create({
+          const newUser = await User.create({
             name: user.name ?? "",
             email: user.email,
             provider: "google",
           });
+         
+          user.id = newUser._id.toString();
+        } else {
+       
+          user.id = existingUser._id.toString();
+          user.provider = existingUser.provider;
+          user.phone = existingUser.phone;
         }
       }
       return true;

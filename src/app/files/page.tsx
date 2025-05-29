@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { FaTimes, FaSearch, FaFilter, FaDownload, FaEye, FaTrash, FaSort, FaHdd } from "react-icons/fa";
 import Upload from "@/components/Upload";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { FaSignInAlt, FaSignOutAlt, FaUserCircle, FaPlus } from "react-icons/fa";
 import {
   FaFilePdf,
@@ -93,7 +92,6 @@ export default function FilesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const { data: session  } = useSession();
-  const { user, isAuthenticated } = useCurrentUser();
 
   const filteredFiles = files.filter(file => 
     file.filename.toLowerCase().includes(searchTerm.toLowerCase())
@@ -121,7 +119,7 @@ export default function FilesPage() {
     fetchFiles();
   }, []);
 
-  console.log(user?.id);
+ 
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">

@@ -1,9 +1,8 @@
-import React from 'react'
+'use client';
+import { useCurrentUserId } from "@/hooks/useCurrentUser";
 
-const page = () => {
-  return (
-    <div>page</div>
-  )
+export default function page() {
+  const userId = useCurrentUserId();
+
+  return <div>User ID: {userId ?? "Not logged in"}</div>;
 }
-
-export default page
