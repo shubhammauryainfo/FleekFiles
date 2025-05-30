@@ -27,7 +27,7 @@ async function deleteFromFTP(ftpPath: string) {
 // Use proper async `params` from context
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string[] } }
+  context: { params: Promise<{ id: string[] }> }
 ) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
@@ -36,7 +36,10 @@ export async function DELETE(
   }
 
   const userId = token.id ?? token.sub;
-  const [fileId] = context.params.id;
+  
+  // Await the params
+  const resolvedParams = await context.params;
+  const [fileId] = resolvedParams.id;
 
   if (!fileId) {
     return NextResponse.json({ error: "Missing file ID" }, { status: 400 });

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectFTP } from "@/lib/ftpClient";
 import { Writable } from "stream";
 
-export async function GET(request: NextRequest, { params }: { params: { path?: string[] } }) {
+export async function GET(
+  request: NextRequest, 
+  { params }: { params: Promise<{ path?: string[] }> }
+) {
   // Await the params object
   const resolvedParams = await params;
 
