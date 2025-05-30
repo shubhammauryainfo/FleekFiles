@@ -72,7 +72,6 @@ function formatFileSize(bytes: number) {
 export default function Upload() {
   const {user} = useCurrentUser();
   const [file, setFile] = useState<File | null>(null);
-  const [userId, setUserId] = useState<string>(user?.id);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
@@ -89,7 +88,7 @@ export default function Upload() {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("userId", userId);
+    formData.append("userId", user?.id);
 
     const xhr = new XMLHttpRequest();
 

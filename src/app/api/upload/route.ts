@@ -18,9 +18,9 @@ export async function POST(req: NextRequest) {
   const stream = Readable.from(buffer);
 
   const ftpClient = await connectFTP();
-  const filePath = `/uploads/${file.name}`;
+  const filePath = `/fleekfiles/${file.name}`;
 
-  await ftpClient.ensureDir("/uploads");
+  await ftpClient.ensureDir("/fleekfiles");
   await ftpClient.uploadFrom(stream, filePath);
   ftpClient.close();
 

@@ -94,6 +94,7 @@ export default function FilesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set());
+  const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(new Set());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const { data: session } = useSession();
   const { user } = useCurrentUser();
@@ -124,6 +125,52 @@ export default function FilesPage() {
     };
     fetchFiles();
   }, [user]);
+
+  const handleDownloadFile = async (file: FileMeta) => {
+    setDownloadingFiles(prev => new Set(prev).add(file._id));
+    
+    try {
+      const response = await fetch(`/api/files${file.path}`);
+      
+      if (!response.ok) {
+        throw new Error('Download failed');
+      }
+
+      // Create blob from response
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.filename;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      // Remove downloading state after a delay for visual feedback
+      setTimeout(() => {
+        setDownloadingFiles(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(file._id);
+          return newSet;
+        });
+      }, 1000);
+      
+    } catch (err: any) {
+      setDownloadingFiles(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(file._id);
+        return newSet;
+      });
+      setError(`Download failed: ${err.message}`);
+    }
+  };
 
   const handleDeleteFile = async (fileId: string) => {
     setDeletingFiles(prev => new Set(prev).add(fileId));
@@ -450,6 +497,7 @@ export default function FilesPage() {
               }>
                 {filteredFiles.map((file) => {
                   const isDeleting = deletingFiles.has(file._id);
+                  const isDownloading = downloadingFiles.has(file._id);
                   
                   return (
                     <div
@@ -484,17 +532,26 @@ export default function FilesPage() {
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <a
-                              href={`/api/files${file.path}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={() => handleDownloadFile(file)}
+                              disabled={isDownloading}
                               className="flex-1 flex items-center justify-center gap-2 px-4 py-3 
                               bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 
-                              transition-all duration-300 font-medium group-hover:bg-blue-600 group-hover:text-white"
+                              transition-all duration-300 font-medium group-hover:bg-blue-600 group-hover:text-white
+                              disabled:opacity-75 disabled:cursor-not-allowed disabled:hover:bg-blue-50 disabled:hover:text-blue-700"
                             >
-                              <FaDownload className="text-sm" />
-                              Download
-                            </a>
+                              {isDownloading ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                                  Downloading...
+                                </>
+                              ) : (
+                                <>
+                                  <FaDownload className="text-sm" />
+                                  Download
+                                </>
+                              )}
+                            </button>
                             
                             <button
                               onClick={() => confirmDelete(file._id)}
@@ -529,17 +586,26 @@ export default function FilesPage() {
                           </div>
 
                           <div className="flex items-center gap-3">
-                            <a
-                              href={`/api/files${file.path}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={() => handleDownloadFile(file)}
+                              disabled={isDownloading}
                               className="flex items-center gap-2 px-6 py-3 
                               bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-600 hover:text-white
-                              transition-all duration-300 font-medium"
+                              transition-all duration-300 font-medium disabled:opacity-75 disabled:cursor-not-allowed
+                              disabled:hover:bg-blue-50 disabled:hover:text-blue-700"
                             >
-                              <FaDownload />
-                              Download
-                            </a>
+                              {isDownloading ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                                  Downloading...
+                                </>
+                              ) : (
+                                <>
+                                  <FaDownload />
+                                  Download
+                                </>
+                              )}
+                            </button>
                             
                             <button
                               onClick={() => confirmDelete(file._id)}
@@ -565,7 +631,6 @@ export default function FilesPage() {
             )}
           </>
         )}
-
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
