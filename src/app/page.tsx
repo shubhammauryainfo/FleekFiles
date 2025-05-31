@@ -6,6 +6,7 @@ import Link from "next/link";
 import Swal from "sweetalert2";
 import { useSession, signIn, signOut } from "next-auth/react";
 import {  FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import {RiFolderTransferFill} from "react-icons/ri";
 import { 
   FiUploadCloud, 
   FiShield, 
@@ -29,6 +30,10 @@ import {
   AiOutlineStar 
 } from "react-icons/ai";
 import { FaSignInAlt } from "react-icons/fa";
+import {  FaReact, FaNodeJs } from 'react-icons/fa';
+import { SiTypescript, SiNextdotjs, SiTailwindcss, SiGraphql } from 'react-icons/si';
+import { BiCodeAlt } from 'react-icons/bi';
+import { SiMongodb } from "react-icons/si";
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -153,10 +158,61 @@ export default function HomePage() {
   ];
 
   const techStack = [
-    { name: "Next.js", description: "React framework for production" },
-    { name: "TypeScript", description: "Type-safe development" },
-    { name: "MongoDB", description: "Modern database solution" },
-    { name: "FTP", description: "Reliable file storage backend" }
+    {
+      name: "React",
+      description: "Modern component-based UI library for building interactive interfaces",
+      icon: <FaReact className="w-8 h-8" />,
+      color: "from-blue-500 to-cyan-400",
+      bgColor: "from-blue-50 to-cyan-50"
+    },
+    {
+      name: "Node.js",
+      description: "Powerful server-side JavaScript runtime for scalable applications",
+      icon: <FaNodeJs className="w-8 h-8" />,
+      bgColor: "from-green-50 to-emerald-50"
+    },
+    {
+      name: "FTP",
+      description: "Reliable file transfer protocol for secure data exchange",
+      icon: <RiFolderTransferFill className="w-8 h-8" />,
+      color: "from-orange-500 to-yellow-500",
+      bgColor: "from-orange-50 to-yellow-50"
+    },
+    {
+      name: "TypeScript",
+      description: "Type-safe JavaScript for better code quality and developer experience",
+      icon: <SiTypescript className="w-8 h-8" />,
+      color: "from-blue-600 to-blue-400",
+      bgColor: "from-blue-50 to-indigo-50"
+    },
+    {
+      name: "Next.js",
+      description: "Full-stack React framework with SSR and optimal performance",
+      icon: <SiNextdotjs className="w-8 h-8" />,
+      color: "from-gray-800 to-gray-600",
+      bgColor: "from-gray-50 to-slate-50"
+    },
+    {
+      name: "Tailwind CSS",
+      description: "Utility-first CSS framework for rapid UI development",
+      icon: <SiTailwindcss className="w-8 h-8" />,
+      color: "from-cyan-500 to-teal-400",
+      bgColor: "from-cyan-50 to-teal-50"
+    },
+    {
+      name: "MongoDB",
+      description: "Flexible NoSQL database for modern application development",
+      icon: <SiMongodb className="w-8 h-8" />,
+      color: "from-green-600 to-green-400",
+      bgColor: "from-green-50 to-emerald-50"
+    },
+    {
+      name: "GraphQL",
+      description: "Efficient API query language for better data fetching",
+      icon: <SiGraphql className="w-8 h-8" />,
+      color: "from-pink-500 to-purple-500",
+      bgColor: "from-pink-50 to-purple-50"
+    }
   ];
 
   return (
@@ -406,24 +462,106 @@ export default function HomePage() {
       </section>
 
       {/* Technology Stack Section */}
-      <section id="tech" className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold text-gray-900 mb-4">Built with Modern Technology</h3>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Leveraging the best tools and frameworks for optimal performance and developer experience.
-            </p>
+      <section id="tech" className="relative py-24 overflow-hidden">
+      {/* Enhanced Background with Gradient and Pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      </div>
+      
+      {/* Floating Background Elements */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      
+      <div className="relative max-w-7xl mx-auto px-6">
+        {/* Enhanced Header */}
+        <div className="text-center mb-20">
+          {/* Icon Badge */}
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-6 shadow-lg transform hover:scale-105 transition-transform duration-300">
+            <BiCodeAlt className="w-8 h-8 text-white" />
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {techStack.map((tech, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition-shadow">
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">{tech.name}</h4>
-                <p className="text-gray-600 text-sm">{tech.description}</p>
-              </div>
-            ))}
+      
+      {/* Gradient Title */}
+      <h3 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-700 to-purple-700 bg-clip-text text-transparent mb-6 tracking-tight">
+        Built with Modern Technology
+      </h3>
+      
+      <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
+        Leveraging cutting-edge tools and frameworks for optimal performance, 
+        scalability, and exceptional developer experience.
+      </p>
+      
+      {/* Animated Underline */}
+      <div className="flex justify-center">
+        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+      </div>
+    </div>
+
+    {/* Enhanced Tech Grid */}
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {techStack.map((tech, index) => (
+        <div 
+          key={index} 
+          className="group relative bg-white/70 backdrop-blur-sm p-8 rounded-2xl border border-white/20 shadow-lg hover:shadow-2xl text-center transform hover:-translate-y-2 transition-all duration-500 hover:bg-white/90"
+          style={{
+            animationDelay: `${index * 150}ms`,
+            animation: 'fadeInUp 0.8s ease-out forwards'
+          }}
+        >
+          {/* Dynamic Gradient Border Effect */}
+          <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${tech.color} opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-sm -z-10`}></div>
+          
+          {/* Tech Icon/Logo Area */}
+          <div className="relative mb-6">
+            <div className={`w-16 h-16 mx-auto bg-gradient-to-br ${tech.bgColor} rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-inner`}>
+              {/* React Icons */}
+             
+                {tech.icon}
+             
+            </div>
+            
+            {/* Floating Dot Animation */}
+            <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 animate-ping transition-opacity duration-300"></div>
           </div>
+          
+          {/* Tech Name with Dynamic Gradient Hover */}
+          <h4 className={`text-xl font-bold text-gray-900 mb-3 group-hover:bg-gradient-to-r group-hover:${tech.color} group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300`}>
+            {tech.name}
+          </h4>
+          
+          {/* Enhanced Description */}
+          <p className="text-gray-600 text-sm leading-relaxed mb-4 group-hover:text-gray-700 transition-colors duration-300">
+            {tech.description}
+          </p>
+          
+          {/* Dynamic Progress Bar Animation */}
+          <div className={`w-0 h-0.5 bg-gradient-to-r ${tech.color} mx-auto group-hover:w-12 transition-all duration-500 rounded-full`}></div>
+          
+          {/* Subtle Tech-Specific Glow Effect */}
+          <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${tech.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
         </div>
-      </section>
+      ))}
+    </div>
+    
+    {/* Bottom Stats/Info Section with Icons */}
+    <div className="mt-20 text-center">
+      <div className="inline-flex items-center space-x-8 text-gray-500">
+        <div className="flex items-center space-x-2 hover:text-green-600 transition-colors duration-300">
+          <FaReact className="w-4 h-4 text-green-400 animate-spin" style={{ animationDuration: '3s' }} />
+          <span className="text-sm font-medium">Always Up-to-Date</span>
+        </div>
+        <div className="flex items-center space-x-2 hover:text-blue-600 transition-colors duration-300">
+          <RiFolderTransferFill className="w-4 h-4 text-blue-400 animate-pulse" />
+          <span className="text-sm font-medium">Production Ready</span>
+        </div>
+        <div className="flex items-center space-x-2 hover:text-purple-600 transition-colors duration-300">
+          <SiGraphql className="w-4 h-4 text-purple-400 animate-pulse delay-700" />
+          <span className="text-sm font-medium">Best Practices</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Contact Section */}
       <section id="contact" className="py-24 bg-gray-50">
@@ -447,7 +585,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">Email</p>
-                      <p className="text-gray-600">hello@fleekfiles.com</p>
+                      <p className="text-gray-600">nexbytes24x7@gmail.com</p>
                     </div>
                   </div>
                   
@@ -457,7 +595,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">Phone</p>
-                      <p className="text-gray-600">+1 (555) 123-4567</p>
+                      <p className="text-gray-600">+91 8828724893</p>
                     </div>
                   </div>
                   
@@ -467,7 +605,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">Office</p>
-                      <p className="text-gray-600">123 Tech Street, San Francisco, CA 94105</p>
+                      <p className="text-gray-600">Vishal Pandey Nagar Nallasopara (East)</p>
                     </div>
                   </div>
                 </div>
@@ -512,7 +650,7 @@ export default function HomePage() {
                       onChange={handleInputChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                      placeholder="John Doe"
+                      placeholder="Sumit Gupta"
                     />
                   </div>
                   
@@ -528,7 +666,7 @@ export default function HomePage() {
                       onChange={handleInputChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="+91 9087654321"
                     />
                   </div>
                 </div>
@@ -545,7 +683,7 @@ export default function HomePage() {
                     onChange={handleInputChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                    placeholder="john@example.com"
+                    placeholder="name@example.com"
                   />
                 </div>
                 
@@ -661,7 +799,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>© {new Date().getFullYear()} FleekFiles. Built for learning and file mastery.</p>
+            <p>© {new Date().getFullYear()} FleekFiles - A <a href="https://nexbytes.rf.gd" className="text-blue-400 hover:underline">Nexbytes</a> Product.</p>
           </div>
         </div>
       </footer>

@@ -57,6 +57,7 @@
         |-- mongoose.ts
     |-- models
         |-- FileMeta.ts
+        |-- LoginLog.ts
         |-- User.ts
     |-- types
         |-- next-auth.d.ts
