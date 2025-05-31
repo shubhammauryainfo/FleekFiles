@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Swal from "sweetalert2";
 import { useSession, signIn, signOut } from "next-auth/react";
 import {  FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 import { 
@@ -30,41 +31,97 @@ import {
 import { FaSignInAlt } from "react-icons/fa";
 
 export default function HomePage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const { data: session } = useSession();
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Handle text input change
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Form submission handler
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
-    });
-    setIsSubmitting(false);
-    alert('Thank you for your message! We\'ll get back to you soon.');
+
+    try {
+      const response = await fetch("https://nexbytes-backend.vercel.app/api/websites", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-key": process.env.NEXT_PUBLIC_CONTACT_API_KEY || "", 
+        },
+        body: JSON.stringify({
+          ...formData,
+          site: "Fleek Files",
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to submit form");
+
+      
+      setFormData({
+        name: "",
+        phone: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+
+      Swal.fire({
+        title: 'Message Sent!',
+        text: "Thank you for your message! We'll get back to you soon.",
+        icon: 'success',
+        confirmButtonText: 'Great!',
+        confirmButtonColor: '#10b981',
+        background: '#ffffff',
+        color: '#374151',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      });
+      
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      
+      // Beautiful error alert
+      Swal.fire({
+        title: 'Oops!',
+        text: 'Sorry, there was an error submitting your message. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'Try Again',
+        confirmButtonColor: '#ef4444',
+        background: '#ffffff',
+        color: '#374151',
+        showClass: {
+          popup: 'animate__animated animate__shakeX'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      });
+      
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   const features = [
     {
       icon: <FiUploadCloud className="w-8 h-8" />,
@@ -439,8 +496,8 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Contact Form */}
-            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                    {/* Contact Form */}
+                    <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -460,20 +517,36 @@ export default function HomePage() {
                   </div>
                   
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address *
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone Number *
                     </label>
                     <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
                       onChange={handleInputChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                      placeholder="john@example.com"
+                      placeholder="+1 (555) 123-4567"
                     />
                   </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                    placeholder="john@example.com"
+                  />
                 </div>
                 
                 <div>
@@ -530,7 +603,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* CTA Section */}
       <section className="py-24 bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-600">
         <div className="max-w-4xl mx-auto text-center px-6">
