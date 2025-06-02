@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/mongoose";
 import { User } from "@/models/User";
 import { LoginLog } from "@/models/LoginLog";
-import { UAParser } from "ua-parser-js";
 import type { NextAuthOptions } from "next-auth";
 import type { User as NextAuthUser, Account, Profile } from "next-auth";
 import type { AdapterUser } from "next-auth/adapters";
@@ -106,27 +105,12 @@ export const authOptions: NextAuthOptions = {
         }
       }
     
-      // ✅ Log login with IP & device
+      // ✅ Log login without IP & device tracking
       try {
-        // Access request from NextAuth's internal context
-        const req = (global as any).__NEXTAUTH_INTERNAL_REQUEST__ || {};
-        const ip = req.headers?.["x-forwarded-for"]?.toString().split(",")[0] || 
-                   req.connection?.remoteAddress || 
-                   req.socket?.remoteAddress || 
-                   "Unknown IP";
-        const ua = req.headers?.["user-agent"] || "Unknown UA";
-    
-        const parser = new UAParser();
-        parser.setUA(ua);
-        const result = parser.getResult();
-        const device = `${result.device.type || "Desktop"} - ${result.os.name} ${result.os.version}`;
-    
         await LoginLog.create({
           email: user.email,
           userId: existingUser?._id.toString() || user.id,
           provider: account?.provider || "credentials",
-          ip,
-          device,
         });
       } catch (error) {
         console.error("Failed to log login:", error);

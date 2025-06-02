@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
 import Image from "next/image";
 import { FaUser, FaEnvelope, FaPhone, FaLock, FaEye, FaEyeSlash, FaUserPlus } from "react-icons/fa";
@@ -95,38 +94,26 @@ export default function RegisterPage() {
         return;
       }
 
-      // Auto sign-in after successful registration
-      const signInResult = await signIn("credentials", {
-        email: form.email,
-        password: form.password,
-        redirect: true,
-        callbackUrl: "/",
+      // Show success message and redirect to sign-in page
+      Swal.fire({
+        icon: 'success',
+        title: '🎉 Registration Successful!',
+        text: 'Your account has been created successfully! You will be redirected to the sign-in page.',
+        background: '#1f2937',
+        color: '#f9fafb',
+        confirmButtonColor: '#10b981',
+        timer: 3000,
+        showConfirmButton: true,
+        confirmButtonText: 'Go to Sign In',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      }).then((result) => {
+        // Redirect to sign-in page whether user clicks button or timer expires
+        router.push('/auth/signin');
       });
 
-      // If for some reason signIn fails without redirect, handle fallback here
-      if (signInResult?.error) {
-        setError("Failed to sign in after registration.");
-        setIsLoading(false);
-        Swal.fire({
-          icon: 'error',
-          title: 'Sign In Failed',
-          text: "Failed to sign in after registration.",
-          background: '#1f2937',
-          color: '#f9fafb',
-          confirmButtonColor: '#ef4444',
-        });
-      } else {
-        Swal.fire({
-          icon: 'success',
-          title: 'Welcome to FleekFiles!',
-          text: 'Your account has been created successfully!',
-          background: '#1f2937',
-          color: '#f9fafb',
-          confirmButtonColor: '#10b981',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
+      setIsLoading(false);
+
     } catch (err) {
       console.error("Registration error:", err);
       setError("Unexpected error occurred. Please try again.");
