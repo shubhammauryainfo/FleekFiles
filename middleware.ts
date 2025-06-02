@@ -8,19 +8,19 @@ export async function middleware(request: NextRequest) {
   // Log middleware execution
   console.log("🔒 Middleware running on:", pathname);
 
-  // Allow public routes and static files
+  // ✅ Allow public routes and static files
+  const publicPaths = ["/auth", "/_next", "/favicon.ico", "/logo.png"];
   if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/auth") ||
-    pathname.includes(".") // static files like .ico, .png, etc.
+    publicPaths.some(path => pathname.startsWith(path)) ||
+    pathname.includes(".") // for static assets
   ) {
     return NextResponse.next();
   }
 
-  // Protected routes
+  // ✅ Protected routes
   const protectedRoutes = ["/files", "/upload"];
   const isProtected = protectedRoutes.some(route =>
-    pathname === route || pathname.startsWith(route + "/")
+    pathname === route || pathname.startsWith(`${route}/`)
   );
 
   if (isProtected) {
@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
 
     if (!token) {
       const signInUrl = new URL("/auth/signin", request.url);
-      signInUrl.searchParams.set("callbackUrl", pathname);
+      signInUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
       return NextResponse.redirect(signInUrl);
     }
   }
@@ -39,7 +39,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// ✅ Define where the middleware applies
+// ✅ Define the matcher only for protected routes
 export const config = {
   matcher: ["/files/:path*", "/upload/:path*"],
 };
