@@ -46,6 +46,7 @@
         |-- not-found.tsx
         |-- page.tsx
     |-- components
+        |-- Layout.tsx
         |-- SessionProvider.tsx
         |-- Upload.tsx
         |-- User.tsx
