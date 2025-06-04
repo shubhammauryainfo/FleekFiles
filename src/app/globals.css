@@ -35,17 +35,163 @@ body {
 
 }
 
+/* Ultra  Webkit Scrollbar - Fixed Version */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 12px;
+  height: 12px;
 }
+
 ::-webkit-scrollbar-track {
-  border: 10px solid transparent;
+  background: 
+    linear-gradient(45deg, 
+      rgba(22, 28, 28, 0.1) 25%, 
+      transparent 25%, 
+      transparent 75%, 
+      rgba(22, 28, 28, 0.1) 75%),
+    linear-gradient(-45deg, 
+      rgba(22, 28, 28, 0.1) 25%, 
+      transparent 25%, 
+      transparent 75%, 
+      rgba(22, 28, 28, 0.1) 75%);
+  background-size: 8px 8px;
+  border-radius: 15px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
+
 ::-webkit-scrollbar-track:hover {
-  border: 12px solid rgba(0, 0, 0.5, 0.2);
+  background: 
+    radial-gradient(circle at center, rgba(255, 74, 164, 0.15), transparent 70%),
+    linear-gradient(45deg, 
+      rgba(127, 29, 240, 0.1) 25%, 
+      transparent 25%, 
+      transparent 75%, 
+      rgba(255, 74, 164, 0.1) 75%);
+  background-size: 100% 100%, 6px 6px;
+  border: 4px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    inset 0 0 20px rgba(255, 74, 164, 0.2),
+    0 0 25px rgba(127, 29, 240, 0.15);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: radial-gradient(at bottom right, #ff4aa4, #ed8961, #7f1df0);
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(255, 74, 164, 0.8), transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(127, 29, 240, 0.6), transparent 70%),
+    linear-gradient(135deg, #ff4aa4, #ed8961, #7f1df0);
   border-radius: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 4px 20px rgba(255, 74, 164, 0.4),
+    0 8px 40px rgba(127, 29, 240, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.4), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(255, 107, 179, 0.9), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(149, 66, 247, 0.7), transparent 50%),
+    radial-gradient(circle at center, rgba(237, 137, 97, 0.5), transparent 60%),
+    linear-gradient(135deg, #ff6bb3, #f19a7a, #9542f7);
+  box-shadow: 
+    0 6px 30px rgba(255, 74, 164, 0.6),
+    0 12px 60px rgba(127, 29, 240, 0.4),
+    0 0 40px rgba(237, 137, 97, 0.3),
+    inset 0 2px 6px rgba(255, 255, 255, 0.35),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.15);
+  transform: scale(1.15);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: 
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.2), transparent 30%),
+    radial-gradient(circle at center, #e0359a, #d67850, #6b18d6);
+  transform: scale(0.9);
+  box-shadow: 
+    0 2px 15px rgba(255, 74, 164, 0.8),
+    inset 0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+::-webkit-scrollbar-corner {
+  background: 
+    radial-gradient(circle at center, rgba(255, 74, 164, 0.1), transparent),
+    rgba(22, 28, 28, 0.3);
+  border-radius: 15px;
+}
+
+/* Enhanced scrollbar for different orientations */
+::-webkit-scrollbar:horizontal {
+  height: 12px;
+}
+
+::-webkit-scrollbar:vertical {
+  width: 12px;
+}
+
+/*  pulsing animations */
+@keyframes sexy-pulse {
+  0% { 
+    box-shadow: 
+      0 4px 20px rgba(255, 74, 164, 0.4),
+      0 8px 40px rgba(127, 29, 240, 0.3),
+      inset 0 2px 4px rgba(255, 255, 255, 0.25);
+  }
+  50% { 
+    box-shadow: 
+      0 6px 35px rgba(255, 74, 164, 0.7),
+      0 12px 70px rgba(127, 29, 240, 0.5),
+      0 0 50px rgba(237, 137, 97, 0.4),
+      inset 0 2px 6px rgba(255, 255, 255, 0.35);
+  }
+  100% { 
+    box-shadow: 
+      0 4px 20px rgba(255, 74, 164, 0.4),
+      0 8px 40px rgba(127, 29, 240, 0.3),
+      inset 0 2px 4px rgba(255, 255, 255, 0.25);
+  }
+}
+
+@keyframes sexy-shimmer {
+  0% { 
+    background-position: -200% 0;
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% { 
+    background-position: 200% 0;
+    opacity: 0.8;
+  }
+}
+
+::-webkit-scrollbar-thumb:hover {
+  animation: sexy-pulse 2s ease-in-out infinite;
+}
+
+/* Shimmer effect using background gradients */
+::-webkit-scrollbar-track:hover {
+  background: 
+    linear-gradient(
+      90deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%
+    ),
+    radial-gradient(circle at center, rgba(255, 74, 164, 0.15), transparent 70%),
+    linear-gradient(45deg, 
+      rgba(127, 29, 240, 0.1) 25%, 
+      transparent 25%, 
+      transparent 75%, 
+      rgba(255, 74, 164, 0.1) 75%);
+  background-size: 200% 100%, 100% 100%, 6px 6px;
+  animation: sexy-shimmer 3s ease-in-out infinite;
 }
