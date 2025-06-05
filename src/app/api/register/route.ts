@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import dbConnect from "@/lib/mongoose"; // <-- import your mongoose connection
+import dbConnect from "@/lib/mongoose";
 import { User, IUser } from "@/models/User";
 import bcrypt from "bcryptjs";
 
@@ -18,11 +18,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
-    await dbConnect(); // <-- await mongoose connection here
+    await dbConnect();
 
-    const existing = await User.findOne({ email });
-    if (existing) {
+    // Check if email already exists
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
       return NextResponse.json({ error: "Email already registered" }, { status: 400 });
+    }
+
+    // Check if phone already exists (only if phone is provided)
+    if (phone) {
+      const existingPhone = await User.findOne({ phone });
+      if (existingPhone) {
+        return NextResponse.json({ error: "Phone number already registered" }, { status: 400 });
+      }
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
