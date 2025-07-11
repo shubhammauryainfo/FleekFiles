@@ -585,7 +585,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">Email</p>
-                      <p className="text-gray-600">nexbytes24x7@gmail.com</p>
+                      <p className="text-gray-600">shubham@nexbytes.in</p>
                     </div>
                   </div>
                   
@@ -750,7 +750,7 @@ export default function HomePage() {
             Start your journey today with our free tier.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/files">
+            <Link href="/auth/register">
               <button className="bg-white text-teal-600 px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors font-semibold shadow-lg">
                 Start Free Trial
               </button>
@@ -799,7 +799,9 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>© {new Date().getFullYear()} FleekFiles - A <a href="https://nexbytes.rf.gd" className="text-blue-400 hover:underline">Nexbytes</a> Product.</p>
+            <p>© {new Date().getFullYear()} FleekFiles
+               {/* - A <a href="https://nexbytes.rf.gd" className="text-blue-400 hover:underline">Nexbytes</a> Product. */}
+               </p>
           </div>
         </div>
       </footer>

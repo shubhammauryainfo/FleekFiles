@@ -7,8 +7,8 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "FleekFiles - A Nexbytes Product",
-  description: "FleekFiles is a cutting-edge file management system designed to streamline your workflow and enhance productivity. Developed by Nexbytes, a leader in innovative technology solutions.",
+  title: "FleekFiles",
+  description: "FleekFiles is a cutting-edge file management system designed to streamline your workflow and enhance productivity. Developed by SHubham .",
 };
 
 
