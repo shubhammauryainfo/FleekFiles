@@ -1,7 +1,6 @@
 |-- .env
 |-- .gitignore
 |-- bun.lock
-|-- middleware.ts
 |-- next-env.d.ts
 |-- next.config.ts
 |-- package-lock.json
@@ -56,6 +55,7 @@
         |-- auth.ts
         |-- ftpClient.ts
         |-- mongoose.ts
+    |-- middleware.ts
     |-- models
         |-- FileMeta.ts
         |-- LoginLog.ts
