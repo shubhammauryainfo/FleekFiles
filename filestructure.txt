@@ -53,6 +53,7 @@
         |-- useCurrentUser.ts
     |-- lib
         |-- auth-utils.ts
+        |-- auth.ts
         |-- ftpClient.ts
         |-- mongoose.ts
     |-- middleware.ts
