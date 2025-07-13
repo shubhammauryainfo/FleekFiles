@@ -93,6 +93,8 @@ export default function Upload() {
     const xhr = new XMLHttpRequest();
 
     xhr.open("POST", "/api/upload");
+    // Pass x-api-key header
+    xhr.setRequestHeader("x-api-key", process.env. NEXT_PUBLIC_API_KEY || "");
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {

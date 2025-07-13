@@ -52,7 +52,7 @@
     |-- hooks
         |-- useCurrentUser.ts
     |-- lib
-        |-- auth.ts
+        |-- auth-utils.ts
         |-- ftpClient.ts
         |-- mongoose.ts
     |-- middleware.ts

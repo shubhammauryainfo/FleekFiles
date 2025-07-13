@@ -9,7 +9,11 @@ export function useCurrentUser() {
   useEffect(() => {
     async function loadUser() {
       try {
-        const res = await fetch("/api/user");
+        const res = await fetch("/api/user", {
+          headers: {
+            "x-api-key": process.env. NEXT_PUBLIC_API_KEY || ""
+          }
+        });
         if (!res.ok) throw new Error("Not authenticated");
 
         const data = await res.json();

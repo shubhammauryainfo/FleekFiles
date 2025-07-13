@@ -112,7 +112,11 @@ export default function FilesPage() {
     if (!user) return;
     const fetchFiles = async () => {
       try {
-        const res = await fetch(`/api/files?userId=${user.id}`);
+        const res = await fetch(`/api/files?userId=${user.id}`, {
+          headers: {
+            "x-api-key": process.env.NEXT_PUBLIC_API_KEY || ""
+          }
+        });
         if (!res.ok) throw new Error("Failed to fetch files");
         const data = await res.json();
         setFiles(data);
@@ -129,7 +133,11 @@ export default function FilesPage() {
     setDownloadingFiles(prev => new Set(prev).add(file._id));
     
     try {
-      const response = await fetch(`/api/files${file.path}`);
+      const response = await fetch(`/api/files${file.path}`, {
+        headers: {
+          "x-api-key": process.env. NEXT_PUBLIC_API_KEY || ""
+        }
+      });
       
       if (!response.ok) {
         throw new Error('Download failed');
@@ -178,12 +186,14 @@ export default function FilesPage() {
     try {
       const res = await fetch(`/api/files/delete/${fileId}`, {
         method: 'DELETE',
+        headers: {
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY || ""
+        }
       });
       
       if (!res.ok) {
         throw new Error('Failed to delete file');
       }
-      
       // Wait for animation to show
       setTimeout(() => {
         setFiles(prev => prev.filter(file => file._id !== fileId));

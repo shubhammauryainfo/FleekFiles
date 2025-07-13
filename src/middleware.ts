@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     }
 
     const apiKey = request.headers.get("x-api-key");
-    const validApiKey = process.env.API_KEY;
+    const validApiKey = process.env. NEXT_PUBLIC_API_KEY;
     
     if (!apiKey || apiKey !== validApiKey) {
       console.log("❌ Unauthorized API access");
