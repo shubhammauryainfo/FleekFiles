@@ -17,8 +17,6 @@
             |-- auth
                 |-- [...nextauth]
                     |-- route.ts
-            |-- debug
-                |-- route.ts
             |-- files
                 |-- delete
                     |-- [...id]
@@ -26,17 +24,26 @@
                 |-- route.ts
                 |-- [...path]
                     |-- route.ts
+            |-- loginlog
+                |-- route.ts
+                |-- [userId]
+                    |-- route.ts
             |-- register
                 |-- route.ts
             |-- upload
                 |-- route.ts
             |-- user
                 |-- route.ts
+            |-- users
+                |-- route.ts
+                |-- [id]
+                    |-- route.ts
         |-- auth
             |-- register
                 |-- page.tsx
             |-- signin
                 |-- page.tsx
+        |-- dashboard
         |-- favicon.ico
         |-- files
             |-- page.tsx
@@ -45,6 +52,7 @@
         |-- not-found.tsx
         |-- page.tsx
     |-- components
+        |-- Dashlayout.tsx
         |-- Layout.tsx
         |-- SessionProvider.tsx
         |-- Upload.tsx
