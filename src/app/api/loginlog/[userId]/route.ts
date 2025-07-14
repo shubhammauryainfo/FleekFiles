@@ -5,19 +5,22 @@ import { LoginLog } from "@/models/LoginLog";
 import mongoose from "mongoose";
 
 // GET logs by user ID
-export async function GET(request: Request, { params }: { params: { userId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ userId: string }> }) {
   try {
     await dbConnect();
     
+    // Await params before accessing properties
+    const { userId } = await params;
+    
     // Validate userId format
-    if (!params.userId || !mongoose.Types.ObjectId.isValid(params.userId)) {
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return NextResponse.json({ 
         success: false, 
         message: "Invalid userID format" 
       }, { status: 400 });
     }
     
-    const logs = await LoginLog.find({ userId: params.userId }).sort({ createdAt: -1 });
+    const logs = await LoginLog.find({ userId: userId }).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, logs });
   } catch (error) {
     console.error("Failed to fetch user logs:", error);
@@ -29,19 +32,22 @@ export async function GET(request: Request, { params }: { params: { userId: stri
 }
 
 // DELETE logs by user ID
-export async function DELETE(request: Request, { params }: { params: { userId: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ userId: string }> }) {
   try {
     await dbConnect();
     
+    // Await params before accessing properties
+    const { userId } = await params;
+    
     // Validate userId format
-    if (!params.userId || !mongoose.Types.ObjectId.isValid(params.userId)) {
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return NextResponse.json({ 
         success: false, 
         message: "Invalid user ID format" 
       }, { status: 400 });
     }
     
-    const result = await LoginLog.deleteMany({ userId: params.userId });
+    const result = await LoginLog.deleteMany({ userId: userId });
     return NextResponse.json({ 
       success: true, 
       message: `Deleted ${result.deletedCount} log(s)`,
