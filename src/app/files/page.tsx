@@ -5,7 +5,7 @@ import Image from "next/image";
 import { FaTimes, FaSearch, FaFilter, FaDownload, FaEye, FaTrash, FaSort, FaHdd } from "react-icons/fa";
 import Upload from "@/components/Upload";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import {  FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import Layout from "@/components/Layout";
 import {
   FaFilePdf,
@@ -108,26 +108,36 @@ export default function FilesPage() {
   const storagePercentage = Math.min((totalStorageUsed / storageLimit) * 100, 100);
   const remainingStorage = Math.max(storageLimit - totalStorageUsed, 0);
 
-  useEffect(() => {
+  // Fetch files function
+  const fetchFiles = async () => {
     if (!user) return;
-    const fetchFiles = async () => {
-      try {
-        const res = await fetch(`/api/files?userId=${user.id}`, {
-          headers: {
-            "x-api-key": process.env.NEXT_PUBLIC_API_KEY || ""
-          }
-        });
-        if (!res.ok) throw new Error("Failed to fetch files");
-        const data = await res.json();
-        setFiles(data);
-      } catch (err: any) {
-        setError(err.message || "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    };
+    
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/files?userId=${user.id}`, {
+        headers: {
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY || ""
+        }
+      });
+      if (!res.ok) throw new Error("Failed to fetch files");
+      const data = await res.json();
+      setFiles(data);
+    } catch (err: any) {
+      setError(err.message || "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchFiles();
   }, [user]);
+
+  // Handle upload success - refresh files and close modal
+  const handleUploadSuccess = () => {
+    fetchFiles(); // Refresh the files list
+    setShowModal(false); // Close the modal
+  };
 
   const handleDownloadFile = async (file: FileMeta) => {
     setDownloadingFiles(prev => new Set(prev).add(file._id));
@@ -135,7 +145,7 @@ export default function FilesPage() {
     try {
       const response = await fetch(`/api/files${file.path}`, {
         headers: {
-          "x-api-key": process.env. NEXT_PUBLIC_API_KEY || ""
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY || ""
         }
       });
       
@@ -560,6 +570,7 @@ export default function FilesPage() {
             )}
           </>
         )}
+        
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -641,7 +652,7 @@ export default function FilesPage() {
                 </div>
               </div>
               
-              <Upload />
+              <Upload onUploadSuccess={handleUploadSuccess} />
             </div>
           </div>
         )}

@@ -17,6 +17,10 @@
             |-- auth
                 |-- [...nextauth]
                     |-- route.ts
+            |-- filemeta
+                |-- route.ts
+                |-- [userId]
+                    |-- route.ts
             |-- files
                 |-- delete
                     |-- [...id]
@@ -44,6 +48,9 @@
             |-- signin
                 |-- page.tsx
         |-- dashboard
+            |-- page.tsx
+            |-- users
+                |-- page.tsx
         |-- favicon.ico
         |-- files
             |-- page.tsx
@@ -53,8 +60,10 @@
         |-- page.tsx
     |-- components
         |-- Dashlayout.tsx
+        |-- Header.tsx
         |-- Layout.tsx
         |-- SessionProvider.tsx
+        |-- Table.tsx
         |-- Upload.tsx
         |-- User.tsx
     |-- hooks
@@ -63,6 +72,7 @@
         |-- auth-utils.ts
         |-- auth.ts
         |-- ftpClient.ts
+        |-- metadata.ts
         |-- mongoose.ts
     |-- middleware.ts
     |-- models
