@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FaBars, FaTimes, FaHome, FaSignOutAlt } from "react-icons/fa";
-import { VscFeedback } from "react-icons/vsc";
 import { FaPeopleGroup, FaWpforms } from "react-icons/fa6";
-import { SlEnvolopeLetter } from "react-icons/sl";
 import { IconType } from "react-icons";
+import { LuLogs } from "react-icons/lu";
+import { LuFileStack } from "react-icons/lu";
 
 interface LinkItem {
     href: string;
@@ -29,10 +29,10 @@ const Layout: React.FC<DashLayoutProps> = ({ children }) => {
     // Links data with enhanced styling
     const links: LinkItem[] = [
         { href: "/dashboard", label: "Home", icon: FaHome },
-        { href: "dashboard/users", label: "Users", icon: FaPeopleGroup },
-        { href: "dashboard/feedbacks", label: "Feedbacks", icon: VscFeedback },
-        { href: "dashboard/letters", label: "Letters", icon: SlEnvolopeLetter },
-        { href: "dashboard/forms", label: "Forms", icon: FaWpforms },
+        { href: "/dashboard/users", label: "Users", icon: FaPeopleGroup },
+        { href: "/dashboard/loginlogs", label: "Login Logs", icon: LuLogs },
+        { href: "/dashboard/files", label: "Files Uploads", icon: LuFileStack  },
+        { href: "/dashboard/forms", label: "Forms", icon: FaWpforms },
     ];
 
     return (

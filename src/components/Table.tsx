@@ -182,7 +182,7 @@ const Table: React.FC<TableProps> = ({
     return (
         <div className={`overflow-x-auto mt-2 rounded-lg shadow-sm max-w-[1243px] ${className}`}>
             {/* Controls */}
-            <div className="mb-3 flex flex-wrap gap-2 items-center justify-between bg-gray-50 p-2 rounded-t-lg border">
+                <div className="mb-3 flex flex-wrap gap-2 items-center justify-between bg-gray-50 p-2 rounded-t-lg border-2 border-[#01ccc9]">
                 <div className="flex flex-wrap gap-1 items-center">
                     {/* Search */}
                     {searchable && (

@@ -48,6 +48,10 @@
             |-- signin
                 |-- page.tsx
         |-- dashboard
+            |-- files
+                |-- page.tsx
+            |-- loginlogs
+                |-- page.tsx
             |-- page.tsx
             |-- users
                 |-- page.tsx
