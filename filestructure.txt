@@ -17,6 +17,10 @@
             |-- auth
                 |-- [...nextauth]
                     |-- route.ts
+            |-- feedback
+                |-- route.ts
+                |-- [id]
+                    |-- route.ts
             |-- filemeta
                 |-- route.ts
                 |-- [userId]
@@ -48,6 +52,8 @@
             |-- signin
                 |-- page.tsx
         |-- dashboard
+            |-- feedbacks
+                |-- page.tsx
             |-- files
                 |-- page.tsx
             |-- loginlogs
@@ -55,6 +61,8 @@
             |-- page.tsx
             |-- users
                 |-- page.tsx
+                |-- [id]
+                    |-- page.tsx
         |-- favicon.ico
         |-- files
             |-- page.tsx
@@ -76,10 +84,10 @@
         |-- auth-utils.ts
         |-- auth.ts
         |-- ftpClient.ts
-        |-- metadata.ts
         |-- mongoose.ts
     |-- middleware.ts
     |-- models
+        |-- Feedback.ts
         |-- FileMeta.ts
         |-- LoginLog.ts
         |-- User.ts

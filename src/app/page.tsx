@@ -63,15 +63,14 @@ export default function HomePage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("https://nexbytes-backend.vercel.app/api/websites", {
+      const response = await fetch("/api/feedback", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "auth-key": process.env.NEXT_PUBLIC_CONTACT_API_KEY || "", 
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "", 
         },
         body: JSON.stringify({
           ...formData,
-          site: "Fleek Files",
         }),
       });
 

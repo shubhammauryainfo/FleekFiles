@@ -32,7 +32,7 @@ const Layout: React.FC<DashLayoutProps> = ({ children }) => {
         { href: "/dashboard/users", label: "Users", icon: FaPeopleGroup },
         { href: "/dashboard/loginlogs", label: "Login Logs", icon: LuLogs },
         { href: "/dashboard/files", label: "Files Uploads", icon: LuFileStack  },
-        { href: "/dashboard/forms", label: "Forms", icon: FaWpforms },
+        { href: "/dashboard/feedbacks", label: "Feedbacks", icon: FaWpforms },
     ];
 
     return (

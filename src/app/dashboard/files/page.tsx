@@ -221,7 +221,7 @@ const FilesPage: React.FC = () => {
     if (loadingState.isLoading) {
         return (
             <Layout>
-                <Header title="File Management" />
+                <Header title="Files Meta Data" />
                 <div className="flex items-center justify-center min-h-64">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     <span className="ml-3 text-gray-600 dark:text-gray-400">Loading files...</span>
@@ -233,7 +233,7 @@ const FilesPage: React.FC = () => {
     if (loadingState.error) {
         return (
             <Layout>
-                <Header title="File Management" />
+                <Header title="Files Meta Data" />
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
                     <div className="flex">
                         <div className="flex-shrink-0">

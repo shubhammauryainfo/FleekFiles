@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongoose";
+import mongoose from "mongoose";
 import { User } from "@/models/User";
+import { FileMeta } from "@/models/FileMeta";
+import { LoginLog } from "@/models/LoginLog";
 
-// Get user by ID
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
   
-  // Await the params Promise
   const { id } = await params;
 
   try {
@@ -20,29 +21,40 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
 }
 
-// Delete user by ID
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
   
-  // Await the params Promise
   const { id } = await params;
 
   try {
-    const deletedUser = await User.findByIdAndDelete(id);
-    if (!deletedUser) {
+    const user = await User.findById(id);
+    if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
-    return NextResponse.json({ message: "User deleted successfully" });
+
+    const session = await mongoose.startSession();
+    
+    try {
+      await session.withTransaction(async () => {
+        await FileMeta.deleteMany({ userId: id }).session(session);
+        await LoginLog.deleteMany({ userId: id }).session(session);
+        await User.findByIdAndDelete(id).session(session);
+      });
+      
+      return NextResponse.json({ 
+        message: "User and all related data deleted successfully" 
+      });
+    } finally {
+      await session.endSession();
+    }
   } catch (error) {
     return NextResponse.json({ message: "Error deleting user", error }, { status: 500 });
   }
 }
 
-// Update user by ID
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
   
-  // Await the params Promise
   const { id } = await params;
 
   try {
