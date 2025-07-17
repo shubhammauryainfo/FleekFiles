@@ -1,23 +1,28 @@
-// src/models/User.ts
 import mongoose, { Schema, model, models, Document } from "mongoose";
 
-// Define a TypeScript interface for the user
 export interface IUser extends Document {
   name?: string;
   email: string;
   password?: string;
   phone?: string;
   provider?: string;
+  role?: "user" | "admin";
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-// Define the Mongoose schema
-const UserSchema = new Schema<IUser>({
-  name: String,
-  email: { type: String, unique: true, required: true },
-  password: String,
-  phone: String,
-  provider: String,
-});
+const UserSchema = new Schema<IUser>(
+  {
+    name: { type: String },
+    email: { type: String, unique: true, required: true },
+    password: { type: String },
+    phone: { type: String },
+    provider: { type: String },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
+  },
+  {
+    timestamps: true, 
+  }
+);
 
-// Export the Mongoose model
 export const User = models.User || model<IUser>("User", UserSchema);

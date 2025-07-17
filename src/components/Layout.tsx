@@ -1,6 +1,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
-import { FaUserCircle, FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
+import { FaUserCircle, FaSignOutAlt, FaSignInAlt, FaTachometerAlt } from "react-icons/fa";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const { data: session } = useSession();
@@ -34,23 +35,40 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       <span className="text-slate-600 font-medium text-sm">
                         Welcome back,
                       </span>
-                      <span className="text-slate-900 font-bold text-lg leading-tight truncate max-w-40">
-                        {session.user?.name || "User"}
+                      <span className="text-slate-900 font-bold text-lg leading-tight max-w-48">
+                        {session.user?.name || "User"} 
                       </span>
                     </div>
                   </div>
   
-                  <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                    className="group flex items-center gap-3 px-6 py-3 text-sm font-semibold text-white 
-                    bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl shadow-lg shadow-red-500/25
-                    hover:from-red-600 hover:to-rose-700 hover:shadow-xl hover:shadow-red-500/30 
-                    hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 ease-out
-                    focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-white"
-                  >
-                    <FaSignOutAlt className="group-hover:rotate-12 transition-transform duration-300" />
-                    Sign Out
-                  </button>
+                  <div className="flex items-center gap-4">
+                    {/* Dashboard Button - Only visible for admin users */}
+                    {session.user.role === "admin" && (
+                      <Link
+                        href="/dashboard"
+                        className="group flex items-center gap-3 px-6 py-3 text-sm font-semibold text-white 
+                        bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl shadow-lg shadow-emerald-500/25
+                        hover:from-emerald-600 hover:to-teal-700 hover:shadow-xl hover:shadow-emerald-500/30 
+                        hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 ease-out
+                        focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-white"
+                      >
+                        <FaTachometerAlt className="group-hover:rotate-12 transition-transform duration-300" />
+                        Dashboard
+                      </Link>
+                    )}
+
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="group flex items-center gap-3 px-6 py-3 text-sm font-semibold text-white 
+                      bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl shadow-lg shadow-red-500/25
+                      hover:from-red-600 hover:to-rose-700 hover:shadow-xl hover:shadow-red-500/30 
+                      hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 ease-out
+                      focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-white"
+                    >
+                      <FaSignOutAlt className="group-hover:rotate-12 transition-transform duration-300" />
+                      Sign Out
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>

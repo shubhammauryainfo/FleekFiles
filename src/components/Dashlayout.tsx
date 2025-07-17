@@ -1,5 +1,5 @@
 "use client";
-
+import { signOut } from "next-auth/react";
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -179,15 +179,16 @@ const Layout: React.FC<DashLayoutProps> = ({ children }) => {
                             </div> */}
 
                             {/* Logout Button */}
-                            <Link href="/logout">
+                           
                                 <button 
+                                  onClick={() => signOut({ callbackUrl: "/" })}
                                     className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:scale-105 flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-red-300"
                                     type="button"
                                 >
                                     <FaSignOutAlt className="text-sm" />
                                     <span className="hidden sm:block">Logout</span>
                                 </button>
-                            </Link>
+                           
                         </div>
                     </div>
 

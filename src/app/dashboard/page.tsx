@@ -4,10 +4,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { format } from 'date-fns';
 import Layout from '@/components/Dashlayout';
 import Table from '@/components/Table';
-
 import axios from 'axios';
 
-// Type definitions for all API responses
 interface User {
     _id: string;
     name: string;
@@ -90,7 +88,6 @@ const DashboardHomePage: React.FC = () => {
 
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-    // Fetch all data from different APIs
     const fetchAllData = useCallback(async (): Promise<void> => {
         if (!apiKey) {
             setLoadingState({
@@ -106,7 +103,6 @@ const DashboardHomePage: React.FC = () => {
             const headers = { 'x-api-key': apiKey };
             const timeout = 10000;
 
-            // Fetch all data concurrently
             const [usersRes, logsRes, filesRes, feedbackRes] = await Promise.all([
                 axios.get<UsersResponse>('/api/users', { headers, timeout }),
                 axios.get<LoginLogsResponse>('/api/loginlog', { headers, timeout }),
@@ -132,19 +128,16 @@ const DashboardHomePage: React.FC = () => {
         }
     }, [apiKey]);
 
-    // Calculate comprehensive statistics
     const stats = useMemo(() => {
         const now = new Date();
         const today = now.toDateString();
         const thisWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        // User statistics
         const totalUsers = data.users.length;
         const googleUsers = data.users.filter(user => user.provider === 'google').length;
         const credentialUsers = data.users.filter(user => user.provider === 'credentials').length;
 
-        // Login statistics
         const totalLogins = data.loginLogs.length;
         const todayLogins = data.loginLogs.filter(log => 
             new Date(log.timestamp).toDateString() === today
@@ -156,7 +149,6 @@ const DashboardHomePage: React.FC = () => {
             new Date(log.timestamp) >= thisMonth
         ).length;
 
-        // File statistics
         const totalFiles = data.files.length;
         const totalStorageSize = data.files.reduce((sum, file) => sum + file.size, 0);
         const todayFiles = data.files.filter(file => 
@@ -166,7 +158,6 @@ const DashboardHomePage: React.FC = () => {
             new Date(file.uploadedAt) >= thisWeek
         ).length;
 
-        // Feedback statistics
         const totalFeedback = data.feedback.length;
         const todayFeedback = data.feedback.filter(fb => 
             new Date(fb.createdAt).toDateString() === today
@@ -175,20 +166,18 @@ const DashboardHomePage: React.FC = () => {
             new Date(fb.createdAt) >= thisWeek
         ).length;
 
-        // Recent activity
         const recentLogins = data.loginLogs
             .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-            .slice(0, 10); // Increased to 10 for better scrolling demonstration
+            .slice(0, 10);
 
         const recentFiles = data.files
             .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
-            .slice(0, 10); // Increased to 10 for better scrolling demonstration
+            .slice(0, 10);
 
         const recentFeedback = data.feedback
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .slice(0, 10); // Increased for table display
+            .slice(0, 10);
 
-        // Most active users
         const userActivityMap = data.loginLogs.reduce((acc, log) => {
             acc[log.userId] = (acc[log.userId] || 0) + 1;
             return acc;
@@ -196,7 +185,7 @@ const DashboardHomePage: React.FC = () => {
 
         const mostActiveUsers = Object.entries(userActivityMap)
             .sort(([, a], [, b]) => b - a)
-            .slice(0, 10) // Increased to 10 for better scrolling demonstration
+            .slice(0, 10)
             .map(([userId, count]) => ({
                 user: data.users.find(u => u._id === userId),
                 loginCount: count
@@ -225,7 +214,6 @@ const DashboardHomePage: React.FC = () => {
         };
     }, [data]);
 
-    // Format file size
     const formatFileSize = (bytes: number): string => {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -234,7 +222,6 @@ const DashboardHomePage: React.FC = () => {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
-    // Prepare feedback data for table
     const feedbackTableData = useMemo(() => {
         return stats.recentFeedback.map(feedback => ({
             id: feedback._id,
@@ -257,12 +244,10 @@ const DashboardHomePage: React.FC = () => {
         { key: 'createdAt', label: 'Date' }
     ];
 
-    // Refresh data
     const handleRefresh = useCallback(() => {
         fetchAllData();
     }, [fetchAllData]);
 
-    // Effects
     useEffect(() => {
         fetchAllData();
     }, [fetchAllData]);
@@ -272,7 +257,7 @@ const DashboardHomePage: React.FC = () => {
             <Layout>
                 <div className="flex items-center justify-center min-h-64">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-3 text-gray-600 dark:text-gray-400">Loading dashboard...</span>
+                    <span className="ml-3 text-gray-600">Loading dashboard...</span>
                 </div>
             </Layout>
         );
@@ -281,8 +266,7 @@ const DashboardHomePage: React.FC = () => {
     if (loadingState.error) {
         return (
             <Layout>
-               
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+                <div className="bg-red-50 border border-red-200 rounded-md p-4">
                     <div className="flex">
                         <div className="flex-shrink-0">
                             <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -290,15 +274,15 @@ const DashboardHomePage: React.FC = () => {
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                            <h3 className="text-sm font-medium text-red-800">
                                 Error loading dashboard
                             </h3>
-                            <p className="mt-1 text-sm text-red-700 dark:text-red-300">
+                            <p className="mt-1 text-sm text-red-700">
                                 {loadingState.error}
                             </p>
                             <button
                                 onClick={handleRefresh}
-                                className="mt-2 text-sm text-red-600 dark:text-red-400 hover:underline"
+                                className="mt-2 text-sm text-red-600 hover:underline"
                             >
                                 Try again
                             </button>
@@ -311,11 +295,8 @@ const DashboardHomePage: React.FC = () => {
 
     return (
         <Layout>
-           
-            {/* Quick Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {/* Users Stats */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -325,17 +306,16 @@ const DashboardHomePage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.totalUsers}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-sm font-medium text-gray-600">Total Users</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.totalUsers}</p>
+                            <p className="text-xs text-gray-500">
                                 {stats.googleUsers} Google • {stats.credentialUsers} Email
                             </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Login Stats */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -345,17 +325,16 @@ const DashboardHomePage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Logins</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.totalLogins}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-sm font-medium text-gray-600">Total Logins</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.totalLogins}</p>
+                            <p className="text-xs text-gray-500">
                                 {stats.todayLogins} today • {stats.weeklyLogins} this week
                             </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Files Stats */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
@@ -365,17 +344,16 @@ const DashboardHomePage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Files</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.totalFiles}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-sm font-medium text-gray-600">Total Files</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.totalFiles}</p>
+                            <p className="text-xs text-gray-500">
                                 {formatFileSize(stats.totalStorageSize)} • {stats.todayFiles} today
                             </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Feedback Stats */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
@@ -385,9 +363,9 @@ const DashboardHomePage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Feedback</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.totalFeedback}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-sm font-medium text-gray-600">Total Feedback</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.totalFeedback}</p>
+                            <p className="text-xs text-gray-500">
                                 {stats.todayFeedback} today • {stats.weeklyFeedback} this week
                             </p>
                         </div>
@@ -395,14 +373,12 @@ const DashboardHomePage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Activity Overview */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                {/* Recent Login Activity */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">Recent Logins</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
+                <div className="bg-white rounded-lg shadow">
+                    <div className="p-4 sm:p-6 border-b border-gray-200">
+                        <h3 className="text-lg font-medium text-gray-900">Recent Logins</h3>
                     </div>
-                    <div className="p-6 max-h-80 overflow-y-auto">
+                    <div className="p-4 sm:p-6 max-h-80 overflow-y-auto">
                         <div className="space-y-4">
                             {stats.recentLogins.map((login) => (
                                 <div key={login._id} className="flex items-center space-x-3">
@@ -412,28 +388,27 @@ const DashboardHomePage: React.FC = () => {
                                         {login.email.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                        <p className="text-sm font-medium text-gray-900 truncate">
                                             {login.email}
                                         </p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        <p className="text-xs text-gray-500">
                                             {format(new Date(login.timestamp), 'MMM dd, HH:mm')} • {login.provider}
                                         </p>
                                     </div>
                                 </div>
                             ))}
                             {stats.recentLogins.length === 0 && (
-                                <p className="text-sm text-gray-500 dark:text-gray-400">No recent logins</p>
+                                <p className="text-sm text-gray-500">No recent logins</p>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* Recent Files */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">Recent Files</h3>
+                <div className="bg-white rounded-lg shadow">
+                    <div className="p-4 sm:p-6 border-b border-gray-200">
+                        <h3 className="text-lg font-medium text-gray-900">Recent Files</h3>
                     </div>
-                    <div className="p-6 max-h-80 overflow-y-auto">
+                    <div className="p-4 sm:p-6 max-h-80 overflow-y-auto">
                         <div className="space-y-4">
                             {stats.recentFiles.map((file) => (
                                 <div key={file._id} className="flex items-center space-x-3">
@@ -443,28 +418,27 @@ const DashboardHomePage: React.FC = () => {
                                         </svg>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                        <p className="text-sm font-medium text-gray-900 truncate">
                                             {file.filename}
                                         </p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        <p className="text-xs text-gray-500">
                                             {formatFileSize(file.size)} • {format(new Date(file.uploadedAt), 'MMM dd, HH:mm')}
                                         </p>
                                     </div>
                                 </div>
                             ))}
                             {stats.recentFiles.length === 0 && (
-                                <p className="text-sm text-gray-500 dark:text-gray-400">No recent files</p>
+                                <p className="text-sm text-gray-500">No recent files</p>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* Most Active Users */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">Most Active Users</h3>
+                <div className="bg-white rounded-lg shadow">
+                    <div className="p-4 sm:p-6 border-b border-gray-200">
+                        <h3 className="text-lg font-medium text-gray-900">Most Active Users</h3>
                     </div>
-                    <div className="p-6 max-h-80 overflow-y-auto">
+                    <div className="p-4 sm:p-6 max-h-80 overflow-y-auto">
                         <div className="space-y-4">
                             {stats.mostActiveUsers.map((item, index) => (
                                 <div key={item.user?._id} className="flex items-center space-x-3">
@@ -472,41 +446,40 @@ const DashboardHomePage: React.FC = () => {
                                         {item.user?.name.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                        <p className="text-sm font-medium text-gray-900 truncate">
                                             {item.user?.name}
                                         </p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        <p className="text-xs text-gray-500">
                                             {item.loginCount} logins • {item.user?.provider}
                                         </p>
                                     </div>
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    <span className="text-xs text-gray-500">
                                         #{index + 1}
                                     </span>
                                 </div>
                             ))}
                             {stats.mostActiveUsers.length === 0 && (
-                                <p className="text-sm text-gray-500 dark:text-gray-400">No user activity</p>
+                                <p className="text-sm text-gray-500">No user activity</p>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Recent Feedback Table */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-                <div className="p-3 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">Recent Feedback</h3>
+            <div className="bg-white rounded-lg shadow">
+                <div className="p-4 sm:p-6 border-b border-gray-200">
+                    <h3 className="text-lg font-medium text-gray-900">Recent Feedback</h3>
                 </div>
-                <div className="p-3">
+                <div className="p-4 sm:p-6 overflow-x-auto">
                     {feedbackTableData.length > 0 ? (
                         <Table 
                             data={feedbackTableData} 
                             columns={feedbackTableColumns}
                             searchable={true} 
-                             emptyMessage="No Feedbacks found"
+                            emptyMessage="No Feedbacks found"
                         />
                     ) : (
-                        <p className="text-sm text-gray-500 dark:text-gray-400">No recent feedback</p>
+                        <p className="text-sm text-gray-500">No recent feedback</p>
                     )}
                 </div>
             </div>

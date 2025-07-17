@@ -42,6 +42,7 @@ export async function POST(req: Request) {
       password: hashedPassword,
       phone,
       provider: "credentials",
+      role: "user",
     };
 
     await User.create(newUser);

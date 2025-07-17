@@ -9,30 +9,37 @@ declare module "next-auth" {
       image?: string | null;
       phone?: string | null;
       provider?: string | null;
+      role?: "user" | "admin" | null;
+      createdAt?: string | null;
+      updatedAt?: string | null;
     };
   }
 
   interface User {
-    id: string; 
+    id: string;
     name?: string | null;
     email: string;
     image?: string | null;
     phone?: string | null;
     provider?: string | null;
     password?: string;
+    role?: "user" | "admin" | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
   }
 }
 
-
-  declare module "next-auth/jwt" {
-    interface JWT {
-      id?: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-      phone?: string | null;
-      provider?: string | null;
-      sub?: string;
-    }
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    phone?: string | null;
+    provider?: string | null;
+    role?: "user" | "admin" | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
+    sub?: string;
   }
-
+}

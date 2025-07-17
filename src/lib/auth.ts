@@ -4,7 +4,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/mongoose";
 import { User } from "@/models/User";
-import { LoginLog } from "@/models/LoginLog";
 import { logLoginActivity } from "@/lib/auth-utils";
 import type { NextAuthOptions } from "next-auth";
 import type { User as NextAuthUser, Account, Profile } from "next-auth";
@@ -39,6 +38,9 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           phone: user.phone ?? null,
           provider: user.provider ?? null,
+          role: user.role ?? "user",
+          createdAt: user.createdAt?.toISOString() ?? null,
+          updatedAt: user.updatedAt?.toISOString() ?? null,
         };
       },
     }),
@@ -56,6 +58,9 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.provider = (user as any).provider;
         token.phone = (user as any).phone;
+        token.role = (user as any).role ?? "user";
+        token.createdAt = (user as any).createdAt ?? null;
+        token.updatedAt = (user as any).updatedAt ?? null;
       }
       return token;
     },
@@ -67,16 +72,19 @@ export const authOptions: NextAuthOptions = {
         session.user.image = token.picture ?? token.image ?? null;
         (session.user as any).provider = token.provider ?? null;
         (session.user as any).phone = token.phone ?? null;
+        (session.user as any).role = token.role ?? "user";
+        (session.user as any).createdAt = token.createdAt ?? null;
+        (session.user as any).updatedAt = token.updatedAt ?? null;
       }
       return session;
     },
 
-    async signIn({ 
-      user, 
-      account, 
+    async signIn({
+      user,
+      account,
       profile,
       email,
-      credentials 
+      credentials,
     }: {
       user: NextAuthUser | AdapterUser;
       account: Account | null;
@@ -85,31 +93,34 @@ export const authOptions: NextAuthOptions = {
       credentials?: Record<string, any>;
     }) {
       await dbConnect();
-    
+
       if (!user.email) return false;
-    
+
       let existingUser = await User.findOne({ email: user.email });
-    
+
       if (account?.provider === "google") {
         if (!existingUser) {
           const newUser = await User.create({
             name: user.name ?? "",
             email: user.email,
             provider: "google",
+            role: "user",
           });
           user.id = newUser._id.toString();
           existingUser = newUser;
         } else {
           user.id = existingUser._id.toString();
-          (user as any).provider = existingUser.provider;
-          (user as any).phone = existingUser.phone;
         }
+
+        (user as any).provider = existingUser.provider;
+        (user as any).phone = existingUser.phone;
+        (user as any).role = existingUser.role ?? "user";
+        (user as any).createdAt = existingUser.createdAt?.toISOString() ?? null;
+        (user as any).updatedAt = existingUser.updatedAt?.toISOString() ?? null;
       }
-    
-      // ✅ Log login with IP & device tracking
+
       try {
         const storedRequest = (global as any).__NEXT_AUTH_REQUEST__;
-        
         await logLoginActivity(
           user.email,
           existingUser?._id.toString() || user.id,
@@ -119,7 +130,7 @@ export const authOptions: NextAuthOptions = {
       } catch (error) {
         console.error("Failed to log login:", error);
       }
-    
+
       return true;
     },
   },
@@ -130,10 +141,7 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-// Create the base NextAuth handler
 const baseHandler = NextAuth(authOptions);
-
-// Export auth functions for use in other parts of the app
 export const auth = baseHandler.auth;
 export const signIn = baseHandler.signIn;
 export const signOut = baseHandler.signOut;

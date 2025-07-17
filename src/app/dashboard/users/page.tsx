@@ -5,6 +5,7 @@ import { FaRegIdCard } from "react-icons/fa6";
 import Layout from '@/components/Dashlayout';
 import Header from '@/components/Header';
 import Table from '@/components/Table';
+import { format } from 'date-fns';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
@@ -14,7 +15,9 @@ interface UserData {
   email: string;
   phone?: string;
   provider: string;
-  analytics: string
+  analytics: string;
+  createdAt: string;
+  updatedAt: string;
   __v: number;
 }
 
@@ -84,14 +87,14 @@ const UsersPage: React.FC = () => {
       label: 'User',
       render: (row: UserData) => (
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+          <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-medium mr-2 sm:mr-3">
             {getUserInitials(row.name)}
           </div>
-          <div>
-            <span className="text-sm font-medium text-gray-900">
+          <div className="min-w-0 flex-1">
+            <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
               {row.name}
-            </span>
-            <div className="text-xs text-gray-500">
+            </div>
+            <div className="text-xs text-gray-500 truncate block sm:hidden">
               {row.email}
             </div>
           </div>
@@ -102,32 +105,31 @@ const UsersPage: React.FC = () => {
       key: 'email',
       label: 'Email',
       render: (row: UserData) => (
-        <a
-          href={`mailto:${row.email}`}
-          className="text-sm text-blue-600 hover:underline"
-        >
-          {row.email}
-        </a>
+        <div className="hidden sm:block">
+          <a
+            href={`mailto:${row.email}`}
+            className="text-xs sm:text-sm text-blue-600 hover:underline truncate block"
+          >
+            {row.email}
+          </a>
+        </div>
       )
     },
     {
       key: '_id',
-      label: 'User ID',
-      width: '200px',
-      render: (row: UserData) => (
-        <span className="text-xs font-mono text-gray-600">
-          {row._id}
-        </span>
-      )
+      label: 'ID',
+      width:'200px'
     },
     {
       key: 'phone',
       label: 'Phone',
       width: '140px',
       render: (row: UserData) => (
-        <span className="text-sm text-gray-900">
-          {row.phone || 'N/A'}
-        </span>
+        <div className="hidden md:block">
+          <span className="text-xs sm:text-sm text-gray-900">
+            {row.phone || 'N/A'}
+          </span>
+        </div>
       )
     },
     {
@@ -137,26 +139,45 @@ const UsersPage: React.FC = () => {
       render: (row: UserData) => {
         const providerInfo = getProviderInfo(row.provider);
         return (
-          <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${providerInfo.color}`}>
+          <span className={`inline-flex items-center px-1 sm:px-2 py-1 rounded text-xs font-medium ${providerInfo.color}`}>
             <span className="mr-1">{providerInfo.icon}</span>
-            {row.provider.charAt(0).toUpperCase() + row.provider.slice(1)}
+            <span className="hidden sm:inline">
+              {row.provider.charAt(0).toUpperCase() + row.provider.slice(1)}
+            </span>
           </span>
         );
       }
     },
     {
-      key: 'analytics',
-      label: 'Analytics',
-      width: '80px',
+      key: 'updatedAt',
+      label: 'Last Update',
+      width:'120px',
       render: (row: UserData) => {
-        const providerInfo = getProviderInfo(row.provider);
+          const date = new Date(row.updatedAt);
+          const isToday = new Date().toDateString() === date.toDateString();
+          
+          return (
+              <div className="flex flex-col space-y-1">
+                  <span className="text-xs sm:text-sm font-medium text-gray-900">
+                      {format(date, 'MMM dd, yyyy')}
+                  </span>
+                  <span className={`text-xs ${isToday ? 'text-green-600' : 'text-gray-500'}`}>
+                      {format(date, 'hh:mm:ss a')}
+                  </span>
+              </div>
+          );
+      }
+  },
+    {
+      key: 'analytics',
+      label: 'Actions',
+      width: '60px',
+      render: (row: UserData) => {
         return (
-          <a
-            href={`/dashboard/users/${row._id}`} >
-            <button className="bg-blue-500 hover:bg-blue-400 text-white px-1 py-1 text-xl rounded ml-2">
+          <a href={`/dashboard/users/${row._id}`}>
+            <button className="bg-blue-500 hover:bg-blue-400 text-white p-1 sm:p-2 text-sm sm:text-xl rounded transition-colors">
               <FaRegIdCard />
             </button>
-
           </a>
         );
       }
@@ -239,7 +260,6 @@ const UsersPage: React.FC = () => {
   const handleBulkDelete = useCallback(() => {
     if (selectedIds.length === 0) return;
 
-    // First, ask for password
     Swal.fire({
       title: 'Enter Password',
       text: 'Please enter the password to proceed with deletion:',
@@ -262,7 +282,6 @@ const UsersPage: React.FC = () => {
       }
     }).then((passwordResult) => {
       if (passwordResult.isConfirmed) {
-        // Password is correct, now show deletion confirmation
         Swal.fire({
           title: `Delete ${selectedIds.length} selected users?`,
           text: "You won't be able to revert this!",
@@ -275,7 +294,6 @@ const UsersPage: React.FC = () => {
           if (result.isConfirmed) {
             setDeleteLoading(true);
 
-            // Show deleting progress alert
             Swal.fire({
               title: 'Deleting Users...',
               html: `Deleting ${selectedIds.length} users. Please wait...`,
@@ -380,65 +398,68 @@ const UsersPage: React.FC = () => {
     <Layout>
       <Header title="User Management" />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
-        <div className="bg-white rounded-lg shadow p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 my-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
               </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Total Users</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.total}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Google Users</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.providerCounts.google || 0}</p>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Google Users</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.providerCounts.google || 0}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Credential Users</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.providerCounts.credentials || 0}</p>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">Credential Users</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.providerCounts.credentials || 0}</p>
             </div>
           </div>
         </div>
       </div>
-      <Table
-        columns={columns}
-        data={filteredData}
-        searchable={true}
-        exportable={true}
-        selectable={true}
-        onSelectionChange={handleSelectionChange}
-        onDeleteSelected={handleBulkDelete}
-        emptyMessage="No users found"
-      />
+
+      <div className="overflow-hidden">
+        <Table
+          columns={columns}
+          data={filteredData}
+          searchable={true}
+          exportable={true}
+          selectable={true}
+          onSelectionChange={handleSelectionChange}
+          onDeleteSelected={handleBulkDelete}
+          emptyMessage="No users found"
+        />
+      </div>
     </Layout>
   );
 };

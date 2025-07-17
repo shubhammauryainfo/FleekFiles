@@ -8,7 +8,6 @@ import Table from '@/components/Table';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
-// Enhanced type definitions
 interface FeedbackData {
     _id: string;
     name: string;
@@ -33,7 +32,6 @@ interface Column {
     width?: string;
 }
 
-// Loading and error states
 interface LoadingState {
     isLoading: boolean;
     error: string | null;
@@ -52,7 +50,6 @@ const FeedbackPage: React.FC = () => {
 
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-    // Enhanced columns with better rendering and sorting
     const columns: Column[] = useMemo(() => [
         { 
             key: 'name', 
@@ -63,7 +60,7 @@ const FeedbackPage: React.FC = () => {
                     <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                         {row.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="ml-3 font-medium text-gray-900 dark:text-gray-100">
+                    <span className="ml-3 font-medium text-gray-900">
                         {row.name}
                     </span>
                 </div>
@@ -75,7 +72,7 @@ const FeedbackPage: React.FC = () => {
             render: (row: FeedbackData) => (
                 <a 
                     href={`mailto:${row.email}`}
-                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-blue-600 hover:underline break-all"
                 >
                     {row.email}
                 </a>
@@ -85,7 +82,7 @@ const FeedbackPage: React.FC = () => {
             key: 'phone', 
             label: 'Phone',
             render: (row: FeedbackData) => (
-                <span className="font-mono text-sm text-gray-600 dark:text-gray-400">
+                <span className="font-mono text-sm text-gray-600">
                     {row.phone}
                 </span>
             )
@@ -94,7 +91,7 @@ const FeedbackPage: React.FC = () => {
             key: 'subject', 
             label: 'Subject',
             render: (row: FeedbackData) => (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                     {row.subject}
                 </span>
             )
@@ -104,7 +101,7 @@ const FeedbackPage: React.FC = () => {
             label: 'Message',
             render: (row: FeedbackData) => (
                 <div className="max-w-xs">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 truncate" title={row.message}>
+                    <p className="text-sm text-gray-700 truncate" title={row.message}>
                         {row.message.length > 50 ? `${row.message.substring(0, 50)}...` : row.message}
                     </p>
                     {row.message.length > 50 && (
@@ -117,7 +114,7 @@ const FeedbackPage: React.FC = () => {
                                     confirmButtonText: 'Close'
                                 });
                             }}
-                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1"
+                            className="text-xs text-blue-600 hover:underline mt-1"
                         >
                             Read more
                         </button>
@@ -135,10 +132,10 @@ const FeedbackPage: React.FC = () => {
                 
                 return (
                     <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <span className="text-sm font-medium text-gray-900">
                             {format(date, 'MMM dd, yyyy')}
                         </span>
-                        <span className={`text-xs ${isToday ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                        <span className={`text-xs ${isToday ? 'text-green-600' : 'text-gray-500'}`}>
                             {format(date, 'hh:mm:ss a')}
                         </span>
                     </div>
@@ -147,7 +144,6 @@ const FeedbackPage: React.FC = () => {
         }
     ], []);
 
-    // Enhanced data fetching with proper error handling
     const fetchData = useCallback(async (): Promise<void> => {
         if (!apiKey) {
             setLoadingState({
@@ -164,13 +160,12 @@ const FeedbackPage: React.FC = () => {
                 headers: {
                     'x-api-key': apiKey,
                 },
-                timeout: 10000, // 10 second timeout
+                timeout: 10000,
             });
 
             const responseData = response.data;
             
             if (Array.isArray(responseData)) {
-                // Sort by createdAt (newest first)
                 const sortedData = responseData.sort((a, b) => 
                     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                 );
@@ -193,7 +188,6 @@ const FeedbackPage: React.FC = () => {
         }
     }, [apiKey]);
 
-    // Delete feedback function using _id
     const deleteFeedback = async (id: string) => {
         try {
             await axios.delete(`/api/feedback/${id}`, {
@@ -202,7 +196,6 @@ const FeedbackPage: React.FC = () => {
                 },
             });
 
-            // Remove the feedback from both data arrays
             setData((prevData) => prevData.filter((feedback) => feedback._id !== id));
             setFilteredData((prevData) => prevData.filter((feedback) => feedback._id !== id));
         } catch (error) {
@@ -215,7 +208,6 @@ const FeedbackPage: React.FC = () => {
         }
     };
 
-    // Handle selection change for bulk operations
     const handleSelectionChange = useCallback((selectedIndexes: number[]) => {
         const selected = selectedIndexes
             .map((index) => filteredData[index]?._id)
@@ -224,11 +216,9 @@ const FeedbackPage: React.FC = () => {
         setSelectedFeedback(selected);
     }, [filteredData]);
 
-    // Handle bulk delete with password protection
     const handleBulkDelete = useCallback(() => {
         if (selectedIds.length === 0) return;
 
-        // First, ask for password
         Swal.fire({
             title: 'Enter Password',
             text: 'Please enter the password to proceed with deletion:',
@@ -251,7 +241,6 @@ const FeedbackPage: React.FC = () => {
             }
         }).then((passwordResult) => {
             if (passwordResult.isConfirmed) {
-                // Password is correct, now show deletion confirmation
                 Swal.fire({
                     title: `Delete ${selectedIds.length} selected feedback entries?`,
                     text: "You won't be able to revert this!",
@@ -264,7 +253,6 @@ const FeedbackPage: React.FC = () => {
                     if (result.isConfirmed) {
                         setDeleteLoading(true);
                         
-                        // Show deleting progress alert
                         Swal.fire({
                             title: 'Deleting Feedback...',
                             html: `Deleting ${selectedIds.length} feedback entries. Please wait...`,
@@ -304,17 +292,14 @@ const FeedbackPage: React.FC = () => {
         });
     }, [selectedIds]);
 
-    // Refresh data
     const handleRefresh = useCallback(() => {
         fetchData();
     }, [fetchData]);
 
-    // Effects
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-    // Statistics
     const stats = useMemo(() => {
         const total = data.length;
         const today = data.filter(feedback => {
@@ -349,7 +334,7 @@ const FeedbackPage: React.FC = () => {
                 <Header title="Feedback Management" />
                 <div className="flex items-center justify-center min-h-64">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-3 text-gray-600 dark:text-gray-400">Loading feedback...</span>
+                    <span className="ml-3 text-gray-600">Loading feedback...</span>
                 </div>
             </Layout>
         );
@@ -359,7 +344,7 @@ const FeedbackPage: React.FC = () => {
         return (
             <Layout>
                 <Header title="Feedback Management" />
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+                <div className="bg-red-50 border border-red-200 rounded-md p-4">
                     <div className="flex">
                         <div className="flex-shrink-0">
                             <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -367,15 +352,15 @@ const FeedbackPage: React.FC = () => {
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                            <h3 className="text-sm font-medium text-red-800">
                                 Error loading feedback
                             </h3>
-                            <p className="mt-1 text-sm text-red-700 dark:text-red-300">
+                            <p className="mt-1 text-sm text-red-700">
                                 {loadingState.error}
                             </p>
                             <button
                                 onClick={handleRefresh}
-                                className="mt-2 text-sm text-red-600 dark:text-red-400 hover:underline"
+                                className="mt-2 text-sm text-red-600 hover:underline"
                             >
                                 Try again
                             </button>
@@ -390,9 +375,8 @@ const FeedbackPage: React.FC = () => {
         <Layout>
             <Header title="Feedbacks" />
             
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-4">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -402,13 +386,13 @@ const FeedbackPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Feedback</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.total}</p>
+                            <p className="text-sm font-medium text-gray-600">Total Feedback</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -418,13 +402,13 @@ const FeedbackPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Feedback</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.today}</p>
+                            <p className="text-sm font-medium text-gray-600">Today's Feedback</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.today}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
@@ -434,13 +418,13 @@ const FeedbackPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">This Week</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+                            <p className="text-sm font-medium text-gray-600">This Week</p>
+                            <p className="text-2xl font-semibold text-gray-900">{stats.thisWeek}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
@@ -450,8 +434,8 @@ const FeedbackPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Most Common</p>
-                            <p className="text-lg font-semibold text-gray-900 dark:text-white truncate" title={stats.mostCommonSubject}>
+                            <p className="text-sm font-medium text-gray-600">Most Common</p>
+                            <p className="text-lg font-semibold text-gray-900 truncate" title={stats.mostCommonSubject}>
                                 {stats.mostCommonSubject}
                             </p>
                         </div>
@@ -459,16 +443,18 @@ const FeedbackPage: React.FC = () => {
                 </div>
             </div>
 
-            <Table
-                columns={columns}
-                data={filteredData}
-                searchable={true} 
-                exportable={true}
-                selectable={true}
-                onSelectionChange={handleSelectionChange}
-                onDeleteSelected={handleBulkDelete}
-                emptyMessage="No feedback found"
-            />
+            <div className="overflow-x-auto">
+                <Table
+                    columns={columns}
+                    data={filteredData}
+                    searchable={true} 
+                    exportable={true}
+                    selectable={true}
+                    onSelectionChange={handleSelectionChange}
+                    onDeleteSelected={handleBulkDelete}
+                    emptyMessage="No feedback found"
+                />
+            </div>
         </Layout>
     );
 };

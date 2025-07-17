@@ -8,7 +8,6 @@ import Table from '@/components/Table';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
-// Enhanced type definitions
 interface LogData {
     _id: string;
     email: string;
@@ -32,7 +31,6 @@ interface Column {
     width?: string;
 }
 
-// Loading and error states
 interface LoadingState {
     isLoading: boolean;
     error: string | null;
@@ -51,7 +49,6 @@ const UsersLogsPage: React.FC = () => {
 
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-    // Enhanced columns with better rendering and sorting
     const columns: Column[] = useMemo(() => [
         { 
             key: 'email', 
@@ -65,10 +62,10 @@ const UsersLogsPage: React.FC = () => {
             key: 'provider', 
             label: 'Provider',
             render: (row: LogData) => (
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                    ${row.provider === 'google' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 
-                      row.provider === 'credentials' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
-                      'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize
+                    ${row.provider === 'google' ? 'bg-green-100 text-green-800' : 
+                      row.provider === 'credentials' ? 'bg-blue-100 text-blue-800' :
+                      'bg-red-100 text-red-800'}`}>
                     {row.provider}
                 </span>
             )
@@ -77,7 +74,7 @@ const UsersLogsPage: React.FC = () => {
             key: 'ip', 
             label: 'IP Address',
             render: (row: LogData) => (
-                <span className="font-mono text-sm text-gray-600 dark:text-gray-400">
+                <span className="font-mono text-xs sm:text-sm text-gray-600 break-all">
                     {row.ip === '::1' ? 'localhost' : row.ip}
                 </span>
             )
@@ -85,20 +82,26 @@ const UsersLogsPage: React.FC = () => {
         { 
             key: 'device', 
             label: 'Device',
+            render: (row: LogData) => (
+                <span className="text-xs sm:text-sm text-gray-900 break-words">
+                    {row.device}
+                </span>
+            )
         },
         {
             key: 'timestamp',
             label: 'Login Time',
+            width:'120px',
             render: (row: LogData) => {
                 const date = new Date(row.timestamp);
                 const isToday = new Date().toDateString() === date.toDateString();
                 
                 return (
-                    <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <div className="flex flex-col space-y-1">
+                        <span className="text-xs sm:text-sm font-medium text-gray-900">
                             {format(date, 'MMM dd, yyyy')}
                         </span>
-                        <span className={`text-xs ${isToday ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                        <span className={`text-xs ${isToday ? 'text-green-600' : 'text-gray-500'}`}>
                             {format(date, 'hh:mm:ss a')}
                         </span>
                     </div>
@@ -107,7 +110,6 @@ const UsersLogsPage: React.FC = () => {
         }
     ], []);
 
-    // Enhanced data fetching with proper error handling
     const fetchData = useCallback(async (): Promise<void> => {
         if (!apiKey) {
             setLoadingState({
@@ -124,7 +126,7 @@ const UsersLogsPage: React.FC = () => {
                 headers: {
                     'x-api-key': apiKey,
                 },
-                timeout: 10000, // 10 second timeout
+                timeout: 10000,
             });
 
             const responseData = response.data;
@@ -132,7 +134,6 @@ const UsersLogsPage: React.FC = () => {
             if (responseData.success && Array.isArray(responseData.logs)) {
                 const logData = responseData.logs;
                 
-                // Sort by timestamp (newest first)
                 const sortedData = logData.sort((a, b) => 
                     new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
                 );
@@ -155,7 +156,6 @@ const UsersLogsPage: React.FC = () => {
         }
     }, [apiKey]);
 
-    // Delete log function using userId
     const deleteLog = async (userId: string) => {
         try {
             await axios.delete(`/api/loginlog/${userId}`, {
@@ -164,7 +164,6 @@ const UsersLogsPage: React.FC = () => {
                 },
             });
 
-            // Remove the log from both data arrays
             setData((prevData) => prevData.filter((log) => log.userId !== userId));
             setFilteredData((prevData) => prevData.filter((log) => log.userId !== userId));
         } catch (error) {
@@ -177,7 +176,6 @@ const UsersLogsPage: React.FC = () => {
         }
     };
 
-    // Handle selection change for bulk operations
     const handleSelectionChange = useCallback((selectedIndexes: number[]) => {
         const selected = selectedIndexes
             .map((index) => filteredData[index]?.userId)
@@ -186,11 +184,9 @@ const UsersLogsPage: React.FC = () => {
         setSelectedLogs(selected);
     }, [filteredData]);
 
-    // Handle bulk delete with password protection
     const handleBulkDelete = useCallback(() => {
         if (selectedIds.length === 0) return;
 
-        // First, ask for password
         Swal.fire({
             title: 'Enter Password',
             text: 'Please enter the password to proceed with deletion:',
@@ -213,7 +209,6 @@ const UsersLogsPage: React.FC = () => {
             }
         }).then((passwordResult) => {
             if (passwordResult.isConfirmed) {
-                // Password is correct, now show deletion confirmation
                 Swal.fire({
                     title: `Delete ${selectedIds.length} selected login logs?`,
                     text: "You won't be able to revert this!",
@@ -226,7 +221,6 @@ const UsersLogsPage: React.FC = () => {
                     if (result.isConfirmed) {
                         setDeleteLoading(true);
                         
-                        // Show deleting progress alert
                         Swal.fire({
                             title: 'Deleting Login Logs...',
                             html: `Deleting ${selectedIds.length} login logs. Please wait...`,
@@ -266,17 +260,14 @@ const UsersLogsPage: React.FC = () => {
         });
     }, [selectedIds]);
 
-    // Refresh data
     const handleRefresh = useCallback(() => {
         fetchData();
     }, [fetchData]);
 
-    // Effects
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-    // Statistics
     const stats = useMemo(() => {
         const total = data.length;
         const today = data.filter(log => {
@@ -292,9 +283,9 @@ const UsersLogsPage: React.FC = () => {
         return (
             <Layout>
                 <Header title="User Login Logs" />
-                <div className="flex items-center justify-center min-h-64">
+                <div className="flex items-center justify-center min-h-64 px-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-3 text-gray-600 dark:text-gray-400">Loading login logs...</span>
+                    <span className="ml-3 text-sm sm:text-base text-gray-600">Loading login logs...</span>
                 </div>
             </Layout>
         );
@@ -304,7 +295,7 @@ const UsersLogsPage: React.FC = () => {
         return (
             <Layout>
                 <Header title="User Login Logs" />
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+                <div className="bg-red-50 border border-red-200 rounded-md p-4 mx-4 sm:mx-0">
                     <div className="flex">
                         <div className="flex-shrink-0">
                             <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -312,15 +303,15 @@ const UsersLogsPage: React.FC = () => {
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                            <h3 className="text-sm font-medium text-red-800">
                                 Error loading logs
                             </h3>
-                            <p className="mt-1 text-sm text-red-700 dark:text-red-300">
+                            <p className="mt-1 text-sm text-red-700 break-words">
                                 {loadingState.error}
                             </p>
                             <button
                                 onClick={handleRefresh}
-                                className="mt-2 text-sm text-red-600 dark:text-red-400 hover:underline"
+                                className="mt-2 text-sm text-red-600 hover:underline"
                             >
                                 Try again
                             </button>
@@ -335,51 +326,52 @@ const UsersLogsPage: React.FC = () => {
         <Layout>
             <Header title="User Login Logs" />
             
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4 px-4 sm:px-0">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Logins</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.total}</p>
+                            <p className="text-xs sm:text-sm font-medium text-gray-600">Total Logins</p>
+                            <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.total}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Logins</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.today}</p>
+                            <p className="text-xs sm:text-sm font-medium text-gray-600">Today's Logins</p>
+                            <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.today}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <Table
-                columns={columns}
-                data={filteredData}
-                searchable={true} 
-                exportable={true}
-                selectable={true}
-                onSelectionChange={handleSelectionChange}
-                onDeleteSelected={handleBulkDelete}
-                emptyMessage="No login logs found"
-            />
+            <div className="px-4 sm:px-0">
+                <Table
+                    columns={columns}
+                    data={filteredData}
+                    searchable={true} 
+                    exportable={true}
+                    selectable={true}
+                    onSelectionChange={handleSelectionChange}
+                    onDeleteSelected={handleBulkDelete}
+                    emptyMessage="No login logs found"
+                />
+            </div>
         </Layout>
     );
 };

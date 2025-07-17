@@ -7,7 +7,6 @@ import Header from '@/components/Header';
 import Table from '@/components/Table';
 import axios from 'axios';
 
-// Enhanced type definitions
 interface FileData {
     _id: string;
     filename: string;
@@ -31,7 +30,6 @@ interface Column {
     width?: string;
 }
 
-// Loading and error states
 interface LoadingState {
     isLoading: boolean;
     error: string | null;
@@ -47,7 +45,6 @@ const FilesPage: React.FC = () => {
 
     const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-    // Helper function to format file size
     const formatFileSize = (bytes: number): string => {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -56,12 +53,10 @@ const FilesPage: React.FC = () => {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
-    // Helper function to get file extension
     const getFileExtension = (filename: string): string => {
         return filename.split('.').pop()?.toLowerCase() || '';
     };
 
-    // Helper function to get file type icon/color
     const getFileTypeInfo = (filename: string) => {
         const extension = getFileExtension(filename);
         const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
@@ -70,18 +65,17 @@ const FilesPage: React.FC = () => {
         const audioTypes = ['mp3', 'wav', 'flac', 'aac', 'ogg'];
 
         if (imageTypes.includes(extension)) {
-            return { type: 'image', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' };
+            return { type: 'image', color: 'bg-green-100 text-green-800' };
         } else if (documentTypes.includes(extension)) {
-            return { type: 'document', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' };
+            return { type: 'document', color: 'bg-blue-100 text-blue-800' };
         } else if (videoTypes.includes(extension)) {
-            return { type: 'video', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' };
+            return { type: 'video', color: 'bg-purple-100 text-purple-800' };
         } else if (audioTypes.includes(extension)) {
-            return { type: 'audio', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' };
+            return { type: 'audio', color: 'bg-yellow-100 text-yellow-800' };
         }
-        return { type: 'other', color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300' };
+        return { type: 'other', color: 'bg-gray-100 text-gray-800' };
     };
 
-    // Enhanced columns with better rendering and sorting
     const columns: Column[] = useMemo(() => [
         { 
             key: 'filename', 
@@ -93,7 +87,7 @@ const FilesPage: React.FC = () => {
                         <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium mr-2 ${fileInfo.color}`}>
                             {getFileExtension(row.filename).toUpperCase() || 'FILE'}
                         </span>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                        <span className="text-sm font-medium text-gray-900 truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
                             {row.filename}
                         </span>
                     </div>
@@ -103,13 +97,18 @@ const FilesPage: React.FC = () => {
         { 
             key: 'userId', 
             label: 'User ID',
+            render: (row: FileData) => (
+                <span className="text-sm font-medium text-gray-900 truncate max-w-xs">
+                    {row.userId}
+                </span>
+            )
         },
         { 
             key: 'size', 
             label: 'File Size',
-            width:'140px',
+            width: '120px',
             render: (row: FileData) => (
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                <span className="text-sm font-medium text-gray-900">
                     {formatFileSize(row.size)}
                 </span>
             )
@@ -117,21 +116,26 @@ const FilesPage: React.FC = () => {
         { 
             key: 'path', 
             label: 'Path',
+            render: (row: FileData) => (
+                <span className="text-sm font-medium text-gray-900 truncate max-w-xs sm:max-w-sm">
+                    {row.path}
+                </span>
+            )
         },
         {
             key: 'uploadedAt',
             label: 'Upload Time',
-            width:'130px',
+            width: '140px',
             render: (row: FileData) => {
                 const date = new Date(row.uploadedAt);
                 const isToday = new Date().toDateString() === date.toDateString();
                 
                 return (
                     <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <span className="text-sm font-medium text-gray-900">
                             {format(date, 'MMM dd, yyyy')}
                         </span>
-                        <span className={`text-xs ${isToday ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                        <span className={`text-xs ${isToday ? 'text-green-600' : 'text-gray-500'}`}>
                             {format(date, 'hh:mm:ss a')}
                         </span>
                     </div>
@@ -140,7 +144,6 @@ const FilesPage: React.FC = () => {
         }
     ], []);
 
-    // Enhanced data fetching with proper error handling
     const fetchData = useCallback(async (): Promise<void> => {
         if (!apiKey) {
             setLoadingState({
@@ -157,7 +160,7 @@ const FilesPage: React.FC = () => {
                 headers: {
                     'x-api-key': apiKey,
                 },
-                timeout: 10000, // 10 second timeout
+                timeout: 10000,
             });
 
             const responseData = response.data;
@@ -165,7 +168,6 @@ const FilesPage: React.FC = () => {
             if (Array.isArray(responseData.files)) {
                 const fileData = responseData.files;
                 
-                // Sort by upload time (newest first)
                 const sortedData = fileData.sort((a, b) => 
                     new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
                 );
@@ -188,17 +190,14 @@ const FilesPage: React.FC = () => {
         }
     }, [apiKey]);
 
-    // Refresh data
     const handleRefresh = useCallback(() => {
         fetchData();
     }, [fetchData]);
 
-    // Effects
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-    // Statistics
     const stats = useMemo(() => {
         const total = data.length;
         const totalSize = data.reduce((sum, file) => sum + file.size, 0);
@@ -208,7 +207,6 @@ const FilesPage: React.FC = () => {
             return fileDate.toDateString() === today.toDateString();
         }).length;
 
-        // Group files by type
         const fileTypes = data.reduce((acc, file) => {
             const type = getFileTypeInfo(file.filename).type;
             acc[type] = (acc[type] || 0) + 1;
@@ -224,7 +222,7 @@ const FilesPage: React.FC = () => {
                 <Header title="Files Meta Data" />
                 <div className="flex items-center justify-center min-h-64">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-3 text-gray-600 dark:text-gray-400">Loading files...</span>
+                    <span className="ml-3 text-gray-600">Loading files...</span>
                 </div>
             </Layout>
         );
@@ -234,7 +232,7 @@ const FilesPage: React.FC = () => {
         return (
             <Layout>
                 <Header title="Files Meta Data" />
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+                <div className="bg-red-50 border border-red-200 rounded-md p-4 mx-4 sm:mx-0">
                     <div className="flex">
                         <div className="flex-shrink-0">
                             <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -242,15 +240,15 @@ const FilesPage: React.FC = () => {
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                            <h3 className="text-sm font-medium text-red-800">
                                 Error loading files
                             </h3>
-                            <p className="mt-1 text-sm text-red-700 dark:text-red-300">
+                            <p className="mt-1 text-sm text-red-700">
                                 {loadingState.error}
                             </p>
                             <button
                                 onClick={handleRefresh}
-                                className="mt-2 text-sm text-red-600 dark:text-red-400 hover:underline"
+                                className="mt-2 text-sm text-red-600 hover:underline"
                             >
                                 Try again
                             </button>
@@ -265,9 +263,8 @@ const FilesPage: React.FC = () => {
         <Layout>
             <Header title="Files Meta Data" />
             
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 my-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-4 px-4 sm:px-0">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -277,13 +274,13 @@ const FilesPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Files</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.total}</p>
+                            <p className="text-sm font-medium text-gray-600">Total Files</p>
+                            <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.total}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -293,13 +290,13 @@ const FilesPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Uploads</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.today}</p>
+                            <p className="text-sm font-medium text-gray-600">Today's Uploads</p>
+                            <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.today}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
@@ -309,13 +306,13 @@ const FilesPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Storage</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{formatFileSize(stats.totalSize)}</p>
+                            <p className="text-sm font-medium text-gray-600">Total Storage</p>
+                            <p className="text-xl sm:text-2xl font-semibold text-gray-900">{formatFileSize(stats.totalSize)}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-4 sm:p-6">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
@@ -325,20 +322,22 @@ const FilesPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">File Types</p>
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{Object.keys(stats.fileTypes).length}</p>
+                            <p className="text-sm font-medium text-gray-600">File Types</p>
+                            <p className="text-xl sm:text-2xl font-semibold text-gray-900">{Object.keys(stats.fileTypes).length}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <Table
-                columns={columns}
-                data={filteredData}
-                searchable={true} 
-                exportable={true}
-                emptyMessage="No files found"
-            />
+            <div className="px-4 sm:px-0">
+                <Table
+                    columns={columns}
+                    data={filteredData}
+                    searchable={true} 
+                    exportable={true}
+                    emptyMessage="No files found"
+                />
+            </div>
         </Layout>
     );
 };
