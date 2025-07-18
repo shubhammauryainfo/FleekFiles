@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { FaTimes, FaSearch, FaFilter, FaDownload, FaEye, FaTrash, FaSort, FaHdd } from "react-icons/fa";
+import { FaTimes, FaSearch, FaFilter, FaDownload, FaEye, FaTrash, FaSort, FaHdd, FaCopy, FaCheck } from "react-icons/fa";
 import Upload from "@/components/Upload";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { FaPlus } from "react-icons/fa";
@@ -95,6 +95,7 @@ export default function FilesPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set());
   const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(new Set());
+  const [copiedFiles, setCopiedFiles] = useState<Set<string>>(new Set());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const { user } = useCurrentUser();
 
@@ -186,6 +187,42 @@ export default function FilesPage() {
         return newSet;
       });
       setError(`Download failed: ${err.message}`);
+    }
+  };
+
+  const handleCopyLink = async (file: FileMeta) => {
+    const link = `https://fleekfiles.ct.ws/fleekfiles/${file.filename}`;
+    
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopiedFiles(prev => new Set(prev).add(file._id));
+      
+      // Remove copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedFiles(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(file._id);
+          return newSet;
+        });
+      }, 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = link;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      setCopiedFiles(prev => new Set(prev).add(file._id));
+      
+      setTimeout(() => {
+        setCopiedFiles(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(file._id);
+          return newSet;
+        });
+      }, 2000);
     }
   };
 
@@ -437,6 +474,7 @@ export default function FilesPage() {
                 {filteredFiles.map((file) => {
                   const isDeleting = deletingFiles.has(file._id);
                   const isDownloading = downloadingFiles.has(file._id);
+                  const isCopied = copiedFiles.has(file._id);
                   
                   return (
                     <div
@@ -486,8 +524,26 @@ export default function FilesPage() {
                                 </>
                               ) : (
                                 <>
-                                  <FaDownload className="text-sm" />
-                                  Download
+                                  <FaDownload className="text-sm " />
+                                </>
+                              )}
+                            </button>
+                            
+                            <button
+                              onClick={() => handleCopyLink(file)}
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 
+                              bg-green-50 text-green-700 rounded-xl hover:bg-green-100 
+                              transition-all duration-300 font-medium group-hover:bg-green-600 group-hover:text-white"
+                            >
+                              {isCopied ? (
+                                <>
+                                  <FaCheck className="text-sm" />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <FaCopy className="text-sm text-gray-200 " />
+                                  
                                 </>
                               )}
                             </button>
@@ -542,6 +598,25 @@ export default function FilesPage() {
                                 <>
                                   <FaDownload />
                                   Download
+                                </>
+                              )}
+                            </button>
+                            
+                            <button
+                              onClick={() => handleCopyLink(file)}
+                              className="flex items-center gap-2 px-6 py-3 
+                              bg-green-50 text-green-700 rounded-xl hover:bg-green-600 hover:text-white
+                              transition-all duration-300 font-medium"
+                            >
+                              {isCopied ? (
+                                <>
+                                  <FaCheck />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <FaCopy />
+                                  Link
                                 </>
                               )}
                             </button>
