@@ -42,6 +42,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </div>
   
                   <div className="flex items-center gap-4">
+                  <Link
+                        href="/files/user"
+                        className="group flex items-center gap-3 px-6 py-3 text-sm font-semibold text-white 
+                        bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg shadow-blue-500/25
+                        hover:from-blue-600 hover:to-purple-700 hover:shadow-xl hover:shadow-blue-500/30 
+                        hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 ease-out
+                        focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-white"
+                      >
+                        <FaUserCircle className="group-hover:rotate-12 transition-transform duration-300" />
+                       Profile
+                      </Link>
                     {/* Dashboard Button - Only visible for admin users */}
                     {session.user.role === "admin" && (
                       <Link

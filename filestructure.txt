@@ -66,6 +66,8 @@
         |-- favicon.ico
         |-- files
             |-- page.tsx
+            |-- user
+                |-- page.tsx
         |-- globals.css
         |-- layout.tsx
         |-- not-found.tsx
