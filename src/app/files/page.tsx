@@ -102,7 +102,7 @@ export default function FilesPage() {
   const filteredFiles = files.filter(file => 
     file.filename.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  const livelink = process.env.NEXT_PUBLIC_LIVE_URL || "";
   // Calculate storage usage
   const totalStorageUsed = files.reduce((total, file) => total + file.size, 0);
   const storageLimit = 2 * 1024 * 1024 * 1024; // 2GB in bytes
@@ -191,8 +191,8 @@ export default function FilesPage() {
   };
 
   const handleCopyLink = async (file: FileMeta) => {
-    const link = `https://fleekfiles.ct.ws/fleekfiles/${file.filename}`;
-    
+
+  const link = `${livelink}${file.filename}`;
     try {
       await navigator.clipboard.writeText(link);
       setCopiedFiles(prev => new Set(prev).add(file._id));
@@ -515,7 +515,7 @@ export default function FilesPage() {
                               className="flex-1 flex items-center justify-center gap-2 px-4 py-3 
                               bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 
                               transition-all duration-300 font-medium group-hover:bg-blue-600 group-hover:text-white
-                              disabled:opacity-75 disabled:cursor-not-allowed disabled:hover:bg-blue-50 disabled:hover:text-blue-700"
+                              disabled:opacity-75 disabled:cursor-not-allowed disabled:hover:bg-blue-50 hover:text-blue-700"
                             >
                               {isDownloading ? (
                                 <>
@@ -524,7 +524,7 @@ export default function FilesPage() {
                                 </>
                               ) : (
                                 <>
-                                  <FaDownload className="text-sm " />
+                                  <FaDownload className="text-md " />
                                 </>
                               )}
                             </button>
@@ -533,16 +533,17 @@ export default function FilesPage() {
                               onClick={() => handleCopyLink(file)}
                               className="flex-1 flex items-center justify-center gap-2 px-4 py-3 
                               bg-green-50 text-green-700 rounded-xl hover:bg-green-100 
+                              hover:text-green-700
                               transition-all duration-300 font-medium group-hover:bg-green-600 group-hover:text-white"
                             >
                               {isCopied ? (
                                 <>
-                                  <FaCheck className="text-sm" />
+                                  <FaCheck className="text-md" />
                                   Copied!
                                 </>
                               ) : (
                                 <>
-                                  <FaCopy className="text-sm text-gray-200 " />
+                                  <FaCopy className="text-md" />
                                   
                                 </>
                               )}

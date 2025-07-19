@@ -5,7 +5,6 @@ import { FileMeta } from "@/models/FileMeta";
 import { Readable } from "stream";
 import path from "path";
 
-const ROOTFOLDER = process.env.ROOTFOLDER || " ";
 
 export async function POST(req: NextRequest) {
   const data = await req.formData();
@@ -31,9 +30,9 @@ export async function POST(req: NextRequest) {
   const newFilename = `${originalName}${timeSuffix}${extension}`;
 
   const ftpClient = await connectFTP();
-  const filePath = `${ROOTFOLDER}/fleekfiles/${newFilename}`;
+  const filePath = `/htdocs/fleekfiles/${newFilename}`;
 
-  await ftpClient.ensureDir(`${ROOTFOLDER}/fleekfiles`);
+  await ftpClient.ensureDir('/htdocs/fleekfiles');
   await ftpClient.uploadFrom(stream, filePath);
   ftpClient.close();
 
