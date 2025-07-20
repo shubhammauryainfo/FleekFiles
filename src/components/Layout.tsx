@@ -1,10 +1,13 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import { FaUserCircle, FaSignOutAlt, FaSignInAlt, FaTachometerAlt } from "react-icons/fa";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const { data: session } = useSession();
+    const { user } = useCurrentUser();
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         {/* Enhanced Navigation */}
@@ -54,7 +57,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                        Profile
                       </Link>
                     {/* Dashboard Button - Only visible for admin users */}
-                    {session.user.role === "admin" && (
+                    {user?.role === "admin" && (
                       <Link
                         href="/dashboard"
                         className="group flex items-center gap-3 px-6 py-3 text-sm font-semibold text-white 

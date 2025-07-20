@@ -8,7 +8,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "FleekFiles",
-  description: "FleekFiles is a cutting-edge file management system designed to streamline your workflow and enhance productivity. Developed by SHubham .",
+  description: "FleekFiles is a cutting-edge file management system designed to streamline your workflow and enhance productivity. Developed by Shubham .",
 };
 
 

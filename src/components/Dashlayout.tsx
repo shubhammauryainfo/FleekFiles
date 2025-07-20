@@ -52,7 +52,7 @@ const Layout: React.FC<DashLayoutProps> = ({ children }) => {
                 } w-64 lg:w-60`}
             >
                 {/* Sidebar Header */}
-                <div className="bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500 text-white p-6 shadow-lg">
+                <div className="bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500 text-white p-4 shadow-lg">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center relative">
                             <Image

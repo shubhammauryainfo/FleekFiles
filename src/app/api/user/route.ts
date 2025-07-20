@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     id: token.id ?? token.sub ?? null,
     name: token.name,
     email: token.email,
-    // image: token.picture ?? token.image ?? null,
+    role: token.role,  // image: token.picture ?? token.image ?? null,
     // provider: token.provider ?? null,
     // phone: token.phone ?? null,
   });

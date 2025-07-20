@@ -260,7 +260,7 @@ const UserAnalyticsPage: React.FC = () => {
                
                 <div className="flex items-center justify-center min-h-64">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-3 text-gray-600 dark:text-gray-400">Loading user analytics...</span>
+                    <span className="ml-3 text-gray-600 dark:text-gray-400">Loading Your Data...</span>
                 </div>
             </Layout>
         );
@@ -279,7 +279,7 @@ const UserAnalyticsPage: React.FC = () => {
                         </div>
                         <div className="ml-3">
                             <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
-                                Error loading user analytics
+                                Error loading user data
                             </h3>
                             <p className="mt-1 text-sm text-red-700 dark:text-red-300">
                                 {loadingState.error}
@@ -492,7 +492,7 @@ const UserAnalyticsPage: React.FC = () => {
                                             <div className="min-w-0 flex-1">
                                                 <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{login.device}</p>
                                                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                                    {login.ip === '::1' ? 'localhost' : login.ip} • {formatDateShort(login.timestamp)}
+                                                  {formatDateShort(login.timestamp)}
                                                 </p>
                                             </div>
                                         </div>

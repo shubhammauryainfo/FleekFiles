@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
       return new NextResponse(
         JSON.stringify({
           error: "Unauthorized",
-          message: "Missing or invalid API key. To request access, contact: info@nexbytes.in"
+          message: "Missing or invalid API key. To request access, contact: shubham@nexbytes.in"
         }),
         {
           status: 401,

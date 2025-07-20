@@ -38,6 +38,9 @@
                     |-- route.ts
             |-- register
                 |-- route.ts
+            |-- share
+                |-- [id]
+                    |-- route.ts
             |-- upload
                 |-- route.ts
             |-- user
@@ -48,14 +51,17 @@
                     |-- route.ts
         |-- auth
             |-- register
+                |-- layout.tsx
                 |-- page.tsx
             |-- signin
+                |-- layout.tsx
                 |-- page.tsx
         |-- dashboard
             |-- feedbacks
                 |-- page.tsx
             |-- files
                 |-- page.tsx
+            |-- layout.tsx
             |-- loginlogs
                 |-- page.tsx
             |-- page.tsx
@@ -65,13 +71,18 @@
                     |-- page.tsx
         |-- favicon.ico
         |-- files
+            |-- layout.tsx
             |-- page.tsx
             |-- user
+                |-- layout.tsx
                 |-- page.tsx
         |-- globals.css
         |-- layout.tsx
         |-- not-found.tsx
         |-- page.tsx
+        |-- share
+            |-- [id]
+                |-- page.tsx
     |-- components
         |-- Dashlayout.tsx
         |-- Header.tsx
