@@ -82,7 +82,7 @@ function formatFileSize(bytes: number) {
 export default function Upload({ 
   onUploadSuccess, 
   onUploadError,
-  maxFileSize = 100 * 1024 * 1024, // 100MB default
+  maxFileSize = 10 * 1024 * 1024, // 10MB default
   allowedTypes = [],
   storageLimit = 2 * 1024 * 1024 * 1024, // 2GB default
   currentStorageUsed = 0
